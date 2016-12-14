@@ -53,6 +53,10 @@ struct {
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
     { "Use syshax.xml (coldboothax)", "on", "off" },
+	{ "Allow system modifications", "yes", "no" },
+	{ "Enable Cheat Injection", "yes", "no" },
+	{ "Enable Mod Injection", "yes", "no" },
+	{ "Enable Patch Injection", "yes", "no" },
 };
 
 static void console_print_pos(int x, int y, const char *format, ...)
@@ -196,11 +200,11 @@ int ShowMenu(cfw_config_t * currentConfig)
             OSScreenClearBufferEx(0, 0);
             OSScreenClearBufferEx(1, 0);
 
-            console_print_pos(x_offset, 1, "                -- MOCHA CFW %s by Dimok --", APP_VERSION);
+            console_print_pos(x_offset, 1, "-- Frappuccino CFW %s by Dr.Hacknik --", APP_VERSION);
 
-            console_print_pos(x_offset, 3, "Select your options and press A to launch.");
+            console_print_pos(x_offset, 3, "Select your option(s) and press A to launch.");
             console_print_pos(x_offset, 4, "Press HOME to exit back to HBL.");
-            console_print_pos(x_offset, 5, "Hold B on start to force enter this menu");
+            console_print_pos(x_offset, 5, "Press & Hold B upon start to force open this menu");
 
             int y_offset = 7;
             int option_count = sizeof(selection_options) / sizeof(selection_options[0]);
@@ -213,7 +217,7 @@ int ShowMenu(cfw_config_t * currentConfig)
                                   TEXT_SEL(configPtr[idx], "<", " "), selection_options[idx].enabled,  TEXT_SEL(configPtr[idx], ">", " "),
                                   TEXT_SEL(configPtr[idx], " ", "<"), selection_options[idx].disabled, TEXT_SEL(configPtr[idx], " ", ">"));
             }
-
+			console_print_pos(x_offset, 15, "Original Work by Dimok. This is a forked version of Mocha CFW.");
             console_print_pos(x_offset, 16, "Credits go to everyone who contributed to Wii U scene publicly.");
             console_print_pos(x_offset, 17, "Special thanks to smealum, plutoo, yellows8, naehrwert and derrek.");
 
