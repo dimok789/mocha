@@ -15,21 +15,20 @@ homebrew.
 * OTP redirection from SD card for a custom launch image; upon load of the custom firmware if it exists on sd card (sd:/wiiu/apps/mocha/launch_image.tga)
 
 **Frappuccino Features**
-* Custom fw.img support
+* Custom fw.img support (IMG not provided, and custom as in modifications will be allowed) 
 * Allows the injection for Virtual Console
-* Disables and patches signiture checks, to allow custom Applications
+* Disables and patches signiture checks, to allow custom Applications (Already integrated into the application) 
 * Will have the ability to modify the system menu, most likely custom images and color values
 * More system modifications 
 * Easy setup 
 * System Update blocking 
-* Automatic updates for the CFW (If using a fw.img) 
+* Automatic updates for the CFW Application (Updates the Homebrew only, not you CFW.)
 * redNAND Support (Integrated into this CFW) 
 * Allow on the fly cheat code injection 
 * Allow on the fly mod injection as well as patch/dlc injection 
 * Install any Application, Update, DLC, and/or Game. 
 * Allow the ability to launch Loadiine directly from the system menu
-* Allow the ability to change the region of your system, if using EmuNAND; for example, change the region
-from USA to JPN in order to download software from Japan.
+* Allow the ability to change the region of your system, if using EmuNAND; for example, change the region from USA to JPN in order to download software from Japan. NOTE: eShop only! 
 * Region free Disk and Software support
 * And many more features. 
 
