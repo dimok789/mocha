@@ -1,4 +1,7 @@
 #Frappuccino CFW
+
+![Logo](https://github.com/zoltx23/Frappaccino/blob/master/common/images/logo.png?raw=true) 
+
 This is a fork of Mocha CFW by Dimok. This CFW is ment to be for more complex users, 
 and will have more features and further support. As well as some additions from redNAND and other
 homebrew. 
