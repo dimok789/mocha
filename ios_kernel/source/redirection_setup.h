@@ -21,28 +21,9 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef CFW_CONFIG_H_
-#define CFW_CONFIG_H_
+#ifndef _REDIRECTION_SETUP_H_
+#define _REDIRECTION_SETUP_H_
 
-#define APP_VERSION         "v0.2"
-#define APP_PATH            "sd:/wiiu/apps/mocha"
-#define CONFIG_PATH         (APP_PATH "/config.ini")
-
-typedef struct
-{
-    int viewMode;
-    int directLaunch;
-    int launchImage;
-    int noIosReload;
-    int launchSysMenu;
-    int redNAND;
-    int seeprom_red;
-    int otp_red;
-    int syshaxXml;
-} cfw_config_t;
-
-void default_config(cfw_config_t * config);
-int read_config(cfw_config_t * config);
-int write_config(cfw_config_t * config);
+void redirection_setup(void);
 
 #endif

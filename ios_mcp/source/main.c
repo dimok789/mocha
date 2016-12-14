@@ -11,6 +11,7 @@
 #include "ipc.h"
 
 static bool serverKilled;
+static int threadsStarted = 0;
 
 // overwrites command_buffer with response
 // returns length of response (or 0 for no response, negative for error)
@@ -225,15 +226,23 @@ int _main(void *arg)
 	return 0;
 }
 
-void _startMainThread(void)
+int _startMainThread(void)
 {
-    drawSplashScreen();
+    if(threadsStarted == 0)
+    {
+        threadsStarted = 1;
 
-    memset((void*)0x050BD000, 0, 0x3000);
+        int * launchImageConfigured = (int *)(0x05116000 - 4);
+        if(*launchImageConfigured != 0)
+        {
+            drawSplashScreen();
+        }
 
-    int threadId = svcCreateThread(_main, 0, (u32*)(0x050BD000 + 0x1000), 0x1000, 0x78, 1);
-    if(threadId >= 0)
-        svcStartThread(threadId);
+        int threadId = svcCreateThread(_main, 0, (u32*)(0x050BD000 + 0x1000), 0x1000, 0x78, 1);
+        if(threadId >= 0)
+            svcStartThread(threadId);
 
-    ipc_init();
+        ipc_init();
+    }
+    return 0;
 }

@@ -23,6 +23,9 @@
  ***************************************************************************/
 #include "types.h"
 #include "elf_patcher.h"
+#include "ios_mcp_patches.h"
+#include "ios_fs_patches.h"
+#include "ios_bsp_patches.h"
 #include "kernel_patches.h"
 #include "exception_handler.h"
 #include "fsa.h"
@@ -63,11 +66,11 @@ static int kernel_read_otp_internal(int index, void* out_buf, u32 size)
     return 0;
 }
 
-int kernel_init_otp_buffer(u32 sd_sector, int tagValid)
+int kernel_init_otp_buffer(u32 sd_sector, int dumpFound)
 {
     int res;
 
-    if(tagValid)
+    if(dumpFound)
     {
         res = FSA_SDReadRawSectors(otp_buffer, sd_sector, 2);
     }
@@ -77,11 +80,41 @@ int kernel_init_otp_buffer(u32 sd_sector, int tagValid)
         res = orig_kernel_read_otp_internal(0, otp_buffer, 0x400);
     }
 
-    if((res == 0) && !tagValid)
+    if((res == 0) && (dumpFound == 0))
     {
         FSA_SDWriteRawSectors(otp_buffer, sd_sector, 2);
     }
     return res;
+}
+
+void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
+{
+    void (*kernel_launch_bootrom)(u32 launch_address, u32 L, u32 C, u32 H) = (void*)0x0812A050;
+
+    if(*(u32*)(launch_address - 0x300 + 0x1AC) == 0x00DFD000)
+    {
+        int level = disable_interrupts();
+        unsigned int control_register = disable_mmu();
+
+        u32 ios_elf_start = launch_address + 0x804 - 0x300;
+
+        //! try to keep the order of virt. addresses to reduce the memmove amount
+        mcp_run_patches(ios_elf_start);
+        kernel_run_patches(ios_elf_start);
+
+        if(cfw_config.redNAND)
+        {
+            fs_run_patches(ios_elf_start);
+
+            if(cfw_config.seeprom_red)
+                bsp_run_patches(ios_elf_start);
+        }
+
+        restore_mmu(control_register);
+        enable_interrupts(level);
+    }
+
+    kernel_launch_bootrom(launch_address, L, C, H);
 }
 
 void kernel_run_patches(u32 ios_elf_start)
@@ -106,3 +139,4 @@ void kernel_run_patches(u32 ios_elf_start)
     u32 patch_count = (u32)(((u8*)kernel_patches_table_end) - ((u8*)kernel_patches_table)) / sizeof(patch_table_t);
     patch_table_entries(ios_elf_start, kernel_patches_table, patch_count);
 }
+

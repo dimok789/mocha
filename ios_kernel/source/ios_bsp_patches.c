@@ -40,12 +40,11 @@ u32 bsp_get_phys_code_base(void)
 
 int bsp_init_seeprom_buffer(u32 baseSector, int dumpFound)
 {
-	int(*disable_interrupts)() = (int(*)())0x0812E778;
-	int(*enable_interrupts)(int) = (int(*)(int))0x0812E78C;
+    void *tmpBuffer = (void*)0x00140000;
 
     if(dumpFound)
     {
-        int res = FSA_SDReadRawSectors((void*)0x00140000, baseSector, 1);
+        int res = FSA_SDReadRawSectors(tmpBuffer, baseSector, 1);
         if(res < 0)
             return res;
     }
@@ -53,13 +52,13 @@ int bsp_init_seeprom_buffer(u32 baseSector, int dumpFound)
     {
         //! just clear out the seeprom and it will be re-initialized on BSP module
         //! TODO: maybe read in the seeprom here from SPI or BSP module
-        kernel_memset((void*)0x00140000, 0, 0x200);
+        kernel_memset(tmpBuffer, 0, 0x200);
     }
 
 	int level = disable_interrupts();
 	unsigned int control_register = disable_mmu();
 
-    kernel_memcpy((void*)(_seeprom_buffer_start - 0xE6047000 + 0x13D07000), (void*)0x00140000, 0x200);
+    kernel_memcpy((void*)(_seeprom_buffer_start - 0xE6047000 + 0x13D07000), tmpBuffer, 0x200);
 
 	restore_mmu(control_register);
 	enable_interrupts(level);

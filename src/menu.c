@@ -36,7 +36,8 @@
 #include "dynamic_libs/socket_functions.h"
 #include "cfw_config.h"
 
-#define MAX_CONFIG_SETTINGS                 7
+#define MAX_CONFIG_SETTINGS_EXPERT          9
+#define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
 
 #define TEXT_SEL(x, text1, text2)           ((x) ? (text1) : (text2))
 
@@ -49,6 +50,8 @@ struct {
     { "Config view mode", "expert", "default" },
     { "Skip this menu on launch", "on", "off" },
     { "Show launch image", "on", "off" },
+    { "Don't relaunch OS", "on", "off" },
+    { "Launch System Menu", "on", "off" },
     { "redNAND", "on", "off" },
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
@@ -106,7 +109,7 @@ int ShowMenu(cfw_config_t * currentConfig)
     cfw_config_t config;
     memcpy(&config, currentConfig, sizeof(cfw_config_t));
 
-    int max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS : 4;
+    int max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS_EXPERT : MAX_CONFIG_SETTINGS_DEFAULT;
 
     while(1)
     {
@@ -147,7 +150,7 @@ int ShowMenu(cfw_config_t * currentConfig)
                 {
                 case 0:
                     config.viewMode = !config.viewMode;
-                    max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS : 4;
+                    max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS_EXPERT : MAX_CONFIG_SETTINGS_DEFAULT;
                     break;
                 case 1:
                     config.directLaunch = !config.directLaunch;
@@ -156,15 +159,21 @@ int ShowMenu(cfw_config_t * currentConfig)
                     config.launchImage = !config.launchImage;
                     break;
                 case 3:
-                    config.redNAND = !config.redNAND;
+                    config.noIosReload = !config.noIosReload;
                     break;
                 case 4:
-                    config.seeprom_red = !config.seeprom_red;
+                    config.launchSysMenu = !config.launchSysMenu;
                     break;
                 case 5:
-                    config.otp_red = !config.otp_red;
+                    config.redNAND = !config.redNAND;
                     break;
                 case 6:
+                    config.seeprom_red = !config.seeprom_red;
+                    break;
+                case 7:
+                    config.otp_red = !config.otp_red;
+                    break;
+                case 8:
                     config.syshaxXml = !config.syshaxXml;
                     break;
                 default:
@@ -181,6 +190,16 @@ int ShowMenu(cfw_config_t * currentConfig)
                         config.otp_red = 1;
                     }
                 }
+                if(config.noIosReload)
+                {
+                    config.launchImage = 0;
+                    config.redNAND = 0;
+                }
+                else
+                {
+                    config.launchSysMenu = 1;
+                }
+
                 if(config.redNAND == 0)
                 {
                     config.seeprom_red = 0;
@@ -202,7 +221,7 @@ int ShowMenu(cfw_config_t * currentConfig)
             console_print_pos(x_offset, 4, "Press HOME to exit back to HBL.");
             console_print_pos(x_offset, 5, "Hold B on start to force enter this menu");
 
-            int y_offset = 7;
+            int y_offset = 6;
             int option_count = sizeof(selection_options) / sizeof(selection_options[0]);
             int idx;
             int * configPtr = &config.viewMode;
