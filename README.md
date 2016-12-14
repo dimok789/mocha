@@ -24,7 +24,6 @@ homebrew.
 * System Update blocking 
 * Automatic updates for the CFW (If using a fw.img) 
 * redNAND Support (Integrated into this CFW) 
-* System Config Tool will be preinstalled 
 * Allow on the fly cheat code injection 
 * Allow on the fly mod injection as well as patch/dlc injection 
 * Install any Application, Update, DLC, and/or Game. 
