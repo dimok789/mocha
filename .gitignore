@@ -1,4 +1,6 @@
 /*.elf
+/*thumbs.db
+/*.db
 /build
 /ios_bsp/build
 /ios_bsp/ios_bsp.bin.h
