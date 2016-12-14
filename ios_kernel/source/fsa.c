@@ -193,11 +193,12 @@ int FSA_SDReadRawSectors(void *buffer, u32 sector, u32 num_sectors)
 
     res = FSA_RawRead(fsa, buf, 0x200, num_sectors, sector, fd);
 
+    kernel_memcpy(buffer, buf, num_sectors << 9);
+
     svcFree(0xCAFF, buf);
     FSA_RawClose(fsa, fd);
     FSA_Close(fsa);
 
-    kernel_memcpy(buffer, buf, num_sectors << 9);
     return res;
 }
 

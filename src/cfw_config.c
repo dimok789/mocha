@@ -137,7 +137,7 @@ int write_config(cfw_config_t * config)
     if(!pFile)
         return -1;
 
-    fprintf(pFile, "[RIOSUHAX]\n");
+    fprintf(pFile, "[MOCHA]\n");
     fprintf(pFile, "viewMode=%i\n", config->viewMode);
     fprintf(pFile, "directLaunch=%i\n", config->directLaunch);
     fprintf(pFile, "launchImage=%i\n", config->launchImage);
