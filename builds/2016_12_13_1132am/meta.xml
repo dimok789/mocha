@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Frappaccino CFW</name>
+  <coder>Dr.Hacknik</coder>
+  <version>0.1</version>
+  <release_date>20161213</release_date>
+  <short_description>A Custom CFW</short_description>
+-e   <long_description>A custom firmware for the 
+Nintendo Wii U; without the need of a fw.img file.</long_description>
+  <category>cfw</category>
+  <url>https://github.com/zoltx23/Frappuccino-CFW/tree/master</url>
+</app>

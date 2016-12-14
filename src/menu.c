@@ -171,18 +171,6 @@ int ShowMenu(cfw_config_t * currentConfig)
                 case 6:
                     config.syshaxXml = !config.syshaxXml;
                     break;
-				case 7:
-                    config.sysmod = !config.sysmod;
-                    break;
-				case 8:
-                    config.cheat = !config.modifications;
-                    break;
-				case 9:
-                    config.injmod = !config.injmod;
-                    break;
-				case 10:
-                    config.patch = !config.patch;
-                    break;
                 default:
                     break;
                 }
