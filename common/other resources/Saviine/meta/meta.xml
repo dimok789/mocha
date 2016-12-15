@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Saviine</name>
+  <coder>Maschell</coder>
+  <version>1.1b</version>
+  <release_date>20160512120000</release_date>
+  <short_description>Savegame tool</short_description>
+  <long_description>This application dumps and injects savegames of any title that is entered over network to a PC application.
+  </long_description>
+</app>

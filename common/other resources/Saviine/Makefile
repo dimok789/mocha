@@ -28,15 +28,17 @@ export OBJCOPY	:=	$(PREFIX)objcopy
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	frappuccino
+TARGET		:=	saviine
 BUILD		:=	build
 BUILD_DBG	:=	$(TARGET)_dbg
 SOURCES		:=	src \
 				src/dynamic_libs \
-				src/fs \
+				src/game \
+				src/kernel \
+				src/patcher \
 				src/system \
 				src/utils
-DATA		:=	data
+DATA		:=	
 
 INCLUDES	:=  src
 
@@ -87,6 +89,8 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+TTFFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.ttf)))
+PNGFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.png)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -119,35 +123,14 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean install
 
 #---------------------------------------------------------------------------------
-$(BUILD): $(CURDIR)/ios_kernel/ios_kernel.bin.h
+$(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-
-$(CURDIR)/ios_kernel/ios_kernel.bin.h: $(CURDIR)/ios_usb/ios_usb.bin.h $(CURDIR)/ios_mcp/ios_mcp.bin.h $(CURDIR)/ios_fs/ios_fs.bin.h $(CURDIR)/ios_bsp/ios_bsp.bin.h 
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_kernel -f  $(CURDIR)/ios_kernel/Makefile
-
-$(CURDIR)/ios_usb/ios_usb.bin.h:
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_usb -f  $(CURDIR)/ios_usb/Makefile
-
-$(CURDIR)/ios_fs/ios_fs.bin.h:
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_fs -f  $(CURDIR)/ios_fs/Makefile
-
-$(CURDIR)/ios_bsp/ios_bsp.bin.h:
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_bsp -f  $(CURDIR)/ios_bsp/Makefile
-
-$(CURDIR)/ios_mcp/ios_mcp.bin.h:
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_mcp -f  $(CURDIR)/ios_mcp/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).bin $(BUILD_DBG).elf
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_kernel -f  $(CURDIR)/ios_kernel/Makefile clean
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_usb -f  $(CURDIR)/ios_usb/Makefile clean
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_fs -f  $(CURDIR)/ios_fs/Makefile clean
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_bsp -f  $(CURDIR)/ios_bsp/Makefile clean
-	@$(MAKE) --no-print-directory -C $(CURDIR)/ios_mcp -f  $(CURDIR)/ios_mcp/Makefile clean
-
 
 #---------------------------------------------------------------------------------
 else
@@ -224,10 +207,6 @@ $(OUTPUT).elf:  $(OFILES)
 
 #---------------------------------------------------------------------------------
 %.ogg.o : %.ogg
-	@echo $(notdir $<)
-	@bin2s -a 32 $< | $(AS) -o $(@)
-#---------------------------------------------------------------------------------
-%.tga.o : %.tga
 	@echo $(notdir $<)
 	@bin2s -a 32 $< | $(AS) -o $(@)
 
