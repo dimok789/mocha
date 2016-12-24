@@ -1,0 +1,60 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+build/*
+server/src/bin/logs/*
+server/src/bin/saviine_root/*
+server/src/bin/saviine_server.pdb
+server/src/bin/saviine_server.vshost.exe.manifest
+server/src/obj/x86/Debug/saviine_server.exe
+server/src/obj/x86/Debug/saviine_server.pdb
+server/src/bin/saviine_server.vshost.exe
+server/src/bin/saviine_server.exe.config
+server/src/bin/saviine_server.vshost.exe.config
+server/src/obj/x86/Debug/DesignTimeResolveAssemblyReferences.cache
+server/src/obj/x86/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+server/src/obj/x86/Debug/saviine_server.csprojResolveAssemblyReference.cache
+server/src/obj/x86/Debug/saviine_server.csproj.FileListAbsolute.txt
+server/src/obj/x86/Debug/saviine_server.csproj.GenerateResource.Cache
+server/src/obj/x86/Debug/saviine_server.Form1.resources
+server/src/bin/saviine_server.exe

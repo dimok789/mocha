@@ -56,6 +56,22 @@ struct {
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
     { "Use syshax.xml (coldboothax)", "on", "off" },
+	{ "Allow system modifications", "yes", "no" },
+	{ "Enable Cheat Injection", "yes", "no" },
+	{ "Enable Mod Injection", "yes", "no" },
+	{ "Enable Patch Injection", "yes", "no" },
+};
+
+struct {
+    const char *option;
+    const char *enabled;
+    const char *disabled;
+} adv_selection_opt[] =
+{
+	{ "Allow system modifications", "yes", "no" },
+	{ "Enable Cheat Injection", "yes", "no" },
+	{ "Enable Mod Injection", "yes", "no" },
+	{ "Enable Patch Injection", "yes", "no" },
 };
 
 static void console_print_pos(int x, int y, const char *format, ...)
@@ -77,6 +93,29 @@ static void console_print_pos(int x, int y, const char *format, ...)
 
 	if(tmp)
         free(tmp);
+}
+void advMenu()
+{
+ // Init screen and screen buffers
+    OSScreenInit();
+    u32 screen_buf0_size = OSScreenGetBufferSizeEx(0);
+    u32 screen_buf1_size = OSScreenGetBufferSizeEx(1);
+    u8 * screenBuffer = (u8*) memalign(0x100, screen_buf0_size + screen_buf1_size);
+    OSScreenSetBufferEx(0, (void *)screenBuffer);
+    OSScreenSetBufferEx(1, (void *)(screenBuffer + screen_buf0_size));
+
+    OSScreenEnableEx(0, 1);
+    OSScreenEnableEx(1, 1);
+
+	
+	printf("-- Frappuccino CFW %s by Dr.Hacknik --", APP_VERSION);
+	printf("--    Welcome to the advance menu.  --");
+			
+    // Flip buffers
+    OSScreenFlipBuffersEx(0);
+    OSScreenFlipBuffersEx(1);
+
+       
 }
 
 int ShowMenu(cfw_config_t * currentConfig)
@@ -144,6 +183,19 @@ int ShowMenu(cfw_config_t * currentConfig)
 
                 initScreen = 1;
             }
+			if(vpad.btns_d & VPAD_BUTTON_X)
+            {
+		    
+				advMenu();  
+
+
+            }
+			if(vpad.btns_d & VPAD_BUTTON_B)
+            {
+				//Return to the Initial screen
+                initScreen = 1; 
+            }
+			
             else if(vpad.btns_d & (VPAD_BUTTON_LEFT | VPAD_BUTTON_RIGHT))
             {
                 switch(selected)
@@ -215,11 +267,12 @@ int ShowMenu(cfw_config_t * currentConfig)
             OSScreenClearBufferEx(0, 0);
             OSScreenClearBufferEx(1, 0);
 
-            console_print_pos(x_offset, 1, "                -- MOCHA CFW %s by Dimok --", APP_VERSION);
+            console_print_pos(x_offset, 1, "-- Frappuccino CFW %s by Dr.Hacknik --", APP_VERSION);
 
-            console_print_pos(x_offset, 3, "Select your options and press A to launch.");
+            console_print_pos(x_offset, 3, "Select your option(s) and press A to launch.");
             console_print_pos(x_offset, 4, "Press HOME to exit back to HBL.");
-            console_print_pos(x_offset, 5, "Hold B on start to force enter this menu");
+            console_print_pos(x_offset, 5, "Press & Hold B upon start to force open this menu");
+		    console_print_pos(x_offset, 6, "Press X to view the advanced menu");
 
             int y_offset = 6;
             int option_count = sizeof(selection_options) / sizeof(selection_options[0]);
@@ -232,7 +285,7 @@ int ShowMenu(cfw_config_t * currentConfig)
                                   TEXT_SEL(configPtr[idx], "<", " "), selection_options[idx].enabled,  TEXT_SEL(configPtr[idx], ">", " "),
                                   TEXT_SEL(configPtr[idx], " ", "<"), selection_options[idx].disabled, TEXT_SEL(configPtr[idx], " ", ">"));
             }
-
+			console_print_pos(x_offset, 15, "Original Work by Dimok. This is a forked version of  CFW.");
             console_print_pos(x_offset, 16, "Credits go to everyone who contributed to Wii U scene publicly.");
             console_print_pos(x_offset, 17, "Special thanks to smealum, plutoo, yellows8, naehrwert and derrek.");
 

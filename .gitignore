@@ -1,27 +1,48 @@
-/*.elf
-/build
-/ios_bsp/build
-/ios_bsp/ios_bsp.bin.h
-/ios_bsp/ios_bsp_syms.h
-/ios_bsp/*.elf
-/ios_bsp/*.bin
-/ios_fs/build
-/ios_mcp/build
-/ios_mcp/*.elf
-/ios_mcp/ios_mcp_syms.h
-/ios_mcp/ios_mcp.bin.h
-/ios_mcp/*.bin
-/ios_fs/ios_fs_syms.h
-/ios_fs/ios_fs.bin.h
-/ios_fs/*.elf
-/ios_fs/*.bin
-/ios_kernel/*.bin
-/ios_kernel/ios_kernel.bin.h
-/ios_kernel/*.elf
-/ios_kernel/ios_kernel_syms.h
-/ios_kernel/build
-/ios_usb/*.bin
-/ios_usb/ios_usb.bin.h
-/ios_usb/*.elf
-/ios_usb/ios_usb_syms.h
-/ios_usb/build
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.suo
