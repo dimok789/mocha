@@ -23,9 +23,10 @@ int svcFlushDCache(void* address, u32 size);
 int svcCreateThread(int (*callback)(void* arg), void* arg, u32* stack_top, u32 stacksize, int priority, int detached);
 int svcStartThread(int threadId);
 int svcCreateMessageQueue(u32 *ptr, u32 n_msgs);
+int svcDestroyMessageQueue(int queueid);
 int svcRegisterResourceManager(const char* device, int queueid);
 int svcReceiveMessage(int queueid, ipcmessage ** ipc_buf, u32 flags);
 int svcResourceReply(ipcmessage * ipc_message, u32 result);
-u32 svcRead32(u32 addr);
+int svcCustomKernelCommand(u32 command, ...);
 
 #endif

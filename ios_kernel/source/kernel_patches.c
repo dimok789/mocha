@@ -22,8 +22,10 @@
  * distribution.
  ***************************************************************************/
 #include "types.h"
+#include "../../common/kernel_commands.h"
 #include "elf_patcher.h"
 #include "ios_mcp_patches.h"
+#include "ios_acp_patches.h"
 #include "ios_fs_patches.h"
 #include "ios_bsp_patches.h"
 #include "kernel_patches.h"
@@ -55,9 +57,35 @@ static const u32 KERNEL_MCP_IOMAPPINGS_STRUCT[] =
 	0x00000001                  // pid (MCP)
 };
 
-static u32 kernel_syscall_0x81(u32 address)
+static int kernel_syscall_0x81(u32 command, u32 arg1, u32 arg2, u32 arg3)
 {
-    return *(volatile u32*)address;
+    switch(command)
+    {
+    case KERNEL_READ32:
+    {
+        return *(volatile u32*)arg1;
+    }
+    case KERNEL_WRITE32:
+    {
+        *(volatile u32*)arg1 = arg2;
+        break;
+    }
+    case KERNEL_MEMCPY:
+    {
+        //set_domain_register(0xFFFFFFFF);
+        kernel_memcpy((void*)arg1, (void*) arg2, arg3);
+        break;
+    }
+    case KERNEL_GET_CFW_CONFIG:
+    {
+        //set_domain_register(0xFFFFFFFF);
+        kernel_memcpy((void*)arg1, &cfw_config, sizeof(cfw_config));
+        break;
+    }
+    default:
+        return -1;
+    }
+    return 0;
 }
 
 static int kernel_read_otp_internal(int index, void* out_buf, u32 size)
@@ -101,14 +129,11 @@ void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
         //! try to keep the order of virt. addresses to reduce the memmove amount
         mcp_run_patches(ios_elf_start);
         kernel_run_patches(ios_elf_start);
+        fs_run_patches(ios_elf_start);
+        acp_run_patches(ios_elf_start);
 
-        if(cfw_config.redNAND)
-        {
-            fs_run_patches(ios_elf_start);
-
-            if(cfw_config.seeprom_red)
-                bsp_run_patches(ios_elf_start);
-        }
+        if(cfw_config.redNAND && cfw_config.seeprom_red)
+            bsp_run_patches(ios_elf_start);
 
         restore_mmu(control_register);
         enable_interrupts(level);
@@ -120,7 +145,7 @@ void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
 void kernel_run_patches(u32 ios_elf_start)
 {
     section_write(ios_elf_start, (u32)__KERNEL_CODE_START, __KERNEL_CODE_START, __KERNEL_CODE_END - __KERNEL_CODE_START);
-    section_write_word(ios_elf_start, 0x0812A120, ARM_BL(0x0812A120, kernel_launch_ios));
+    //section_write_word(ios_elf_start, 0x0812A120, ARM_BL(0x0812A120, kernel_launch_ios));
 
     section_write(ios_elf_start, 0x08140DE0, KERNEL_MCP_IOMAPPINGS_STRUCT, sizeof(KERNEL_MCP_IOMAPPINGS_STRUCT));
 

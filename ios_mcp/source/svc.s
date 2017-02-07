@@ -20,6 +20,12 @@ svcCreateMessageQueue:
 	.word 0xE7F00CF0
 	bx lr
 
+.global svcDestroyMessageQueue
+.type svcDestroyMessageQueue, %function
+svcDestroyMessageQueue:
+	.word 0xE7F00DF0
+	bx lr
+
 .global svcReceiveMessage
 .type svcReceiveMessage, %function
 svcReceiveMessage:
@@ -92,8 +98,8 @@ svcFlushDCache:
 	.word 0xE7F052F0
 	bx lr
 
-.global svcRead32
-.type svcRead32, %function
-svcRead32:
+.global svcCustomKernelCommand
+.type svcCustomKernelCommand, %function
+svcCustomKernelCommand:
 	.word 0xE7F081F0
 	bx lr

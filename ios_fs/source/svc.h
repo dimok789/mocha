@@ -24,6 +24,6 @@ int svcInvalidateDCache(void* address, u32 size);
 int svcFlushDCache(void* address, u32 size);
 
 void svcShutdown(int shutdown_type);
-u32 svcRead32(u32 addr);
+int svcCustomKernelCommand(u32 command, ...);
 
 #endif

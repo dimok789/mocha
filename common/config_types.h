@@ -21,11 +21,20 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef _CONFIG_TYPES_H_
+#define _CONFIG_TYPES_H_
 
-#include "../../common/config_types.h"
-
-extern cfw_config_t cfw_config;
+typedef struct
+{
+    int viewMode;
+    int directLaunch;
+    int launchImage;
+    int noIosReload;
+    int launchSysMenu;
+    int redNAND;
+    int seeprom_red;
+    int otp_red;
+    int syshaxXml;
+} cfw_config_t;
 
 #endif

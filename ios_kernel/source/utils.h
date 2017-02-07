@@ -48,4 +48,9 @@ static inline void restore_mmu(unsigned int control_register)
 	asm volatile("MCR p15, 0, %0, c1, c0, 0" : : "r" (control_register));
 }
 
+static inline void set_domain_register(unsigned int domain_register)
+{
+	asm volatile("MCR p15, 0, %0, c3, c0, 0" : : "r" (domain_register));
+}
+
 #endif

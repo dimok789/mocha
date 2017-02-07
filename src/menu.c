@@ -34,7 +34,7 @@
 #include "dynamic_libs/sys_functions.h"
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/socket_functions.h"
-#include "cfw_config.h"
+#include "menu.h"
 
 #define MAX_CONFIG_SETTINGS_EXPERT          9
 #define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)

@@ -21,11 +21,10 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef _ACP_PATCHES_H_
+#define _ACP_PATCHES_H_
 
-#include "../../common/config_types.h"
-
-extern cfw_config_t cfw_config;
+u32 acp_get_phys_code_base(void);
+void acp_run_patches(u32 ios_elf_start);
 
 #endif

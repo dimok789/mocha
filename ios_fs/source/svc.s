@@ -61,8 +61,8 @@ svcShutdown:
 	.word 0xE7F072F0
 	bx lr
 
-.global svcRead32
-.type svcRead32, %function
-svcRead32:
+.global svcCustomKernelCommand
+.type svcCustomKernelCommand, %function
+svcCustomKernelCommand:
 	.word 0xE7F081F0
 	bx lr

@@ -2,28 +2,56 @@
 #include "sdio.h"
 #include "dumper.h"
 #include "imports.h"
+#include "devices.h"
+#include "svc.h"
+#include "../../common/config_types.h"
+#include "../../common/kernel_commands.h"
 
-#define INITIALIZING_FLA        0x07
-#define INITIALIZING_MMC        0x0D
-
-
-int getPhysicalDeviceHandle(u32 device);
-
-void createDevThread_entry(int initialization_type)
+void createDevThread_entry(int node_type, u32 *dev_handles)
 {
-    if(initialization_type == INITIALIZING_MMC)
+    FS_SYSLOG_OUTPUT("FSA: %s thread created\n", (char*)dev_handles[0]);
+
+    if(node_type == NODE_TYPE_DEV_MMC)
     {
-        sdcard_init();
+        cfw_config_t cfw_config;
+        FS_MEMSET(&cfw_config, 0, sizeof(cfw_config));
+        svcCustomKernelCommand(KERNEL_GET_CFW_CONFIG, &cfw_config);
+
+        if(cfw_config.redNAND)
+        {
+            sdcard_init();
+        }
     }
-
-    //if(initialization_type == INITIALIZING_FLA)
-    //{
-        //dump_nand_complete();
-    //}
-
-    if(initialization_type == 0x01) // unknown but after SLC init no read/write done at this point yet
+    else if(node_type == NODE_TYPE_DEV_UMS)
     {
-        if(check_nand_dump() == 0)
+        // instead of hooking into attach at 0x10732FBC...lets do this and let the system do the mount
+        fs_attach_info_t * info = (fs_attach_info_t *)(*(u32*)0x1091C2E4);
+        do
+        {
+            if(info->fs_type == FS_TYPE_FAT)
+            {
+                int i;
+                for(i = 0; i < sizeof(info->allowed_devices); i++)
+                {
+                    if(info->allowed_devices[i] == 0)
+                    {
+                        info->allowed_devices[i] = DEVICE_TYPE_USB;
+                        break;
+                    }
+                }
+                break;
+            }
+            info = info->next;
+        }
+        while(info);
+    }
+    else if(node_type == NODE_TYPE_DEV_ATFS) // ATFS is started right before ISFS for slc/slccmpt
+    {
+        cfw_config_t cfw_config;
+        FS_MEMSET(&cfw_config, 0, sizeof(cfw_config));
+        svcCustomKernelCommand(KERNEL_GET_CFW_CONFIG, &cfw_config);
+
+        if(cfw_config.redNAND && (check_nand_dump() == 0))
         {
             clearScreen(0x000000FF);
             _printf(20, 20, "welcome to redNAND!");
