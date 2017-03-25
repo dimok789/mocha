@@ -17,10 +17,13 @@ LIBDIRS += -L$(CURDIR)/../libs
 LIBS += -lgcc
 
 CFILES = $(wildcard source/*.c)
+FAT_CFILES += $(wildcard source/fat/*.c)
 BINFILES = $(wildcard data/*.bin)
 OFILES = $(BINFILES:data/%.bin=build/%.bin.o)
 OFILES += $(CFILES:source/%.c=build/%.o)
+OFILES += $(FAT_CFILES:source/fat/%.c=build/%.o)
 DFILES = $(CFILES:source/%.c=build/%.d)
+DFILES += $(FAT_CFILES:source/fat/%.c=build/%.d)
 SFILES = $(wildcard source/*.s)
 OFILES += $(SFILES:source/%.s=build/%.o)
 PROJECTNAME = ${shell basename "$(CURDIR)"}
@@ -66,6 +69,11 @@ clean:
 -include $(DFILES)
 
 build/%.o: source/%.c
+	@echo "CC $(notdir $<)"
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) -MM $< > build/$*.d
+
+build/%.o: source/fat/%.c
 	@echo "CC $(notdir $<)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@$(CC) -MM $< > build/$*.d
