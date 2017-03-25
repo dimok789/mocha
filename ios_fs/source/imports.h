@@ -1,6 +1,8 @@
 #ifndef IMPORTS_H_
 #define IMPORTS_H_
 
+#include "types.h"
+
 #define FS_IOS_SHUTDOWN                     ((void (*)(int))0x107F6C94)
 
 #define FS_SVC_CREATEMUTEX                  ((int (*)(int, int))0x107F6BBC)
@@ -9,18 +11,26 @@
 #define FS_SVC_DESTROYMUTEX                 ((int (*)(int))0x107F6BD4)
 
 #define FS_SLEEP                            ((void (*)(int))0x1071D668)
+#define FS_MEMCMP                           ((int (*)(const void*, const void*, u32))0x107F4E94)
 #define FS_MEMCPY                           ((void* (*)(void*, const void*, u32))0x107F4F7C)
 #define FS_MEMSET                           ((void* (*)(void*, int, u32))0x107F5018)
 #define FS_VSNPRINTF                        ((int (*)(char * s, size_t n, const char * format, va_list arg))0x107F5F68)
 #define FS_SNPRINTF                         ((int (*)(char * s, size_t n, const char * format, ...))0x107F5FB4)
+#define FS_STRNCPY                          ((void* (*)(char*, const char*, u32))0x107F60DC)
+#define FS_STRNCMP                          ((int (*)(const char*, const char*, u32))0x107F6138)
+#define FS_SAFE_STRLEN                      ((int (*)(const char*, u32))0x107F61BC)
 
 #define FS_RAW_READ1                        ((int (*)(int handle, u32 offset_high, u32 offset_low, u32 size, void* buf, void *callback, int callback_arg))0x10732BC0)
 #define FS_SDIO_DOREADWRITECOMMAND          ((int (*)(int, void*, u32, void*, void*))0x10718A8C)
 
 #define FS_REGISTERMDPHYSICALDEVICE         ((int (*)(void*, int, int))0x10718860)
 
+#define memcmp                              FS_MEMCMP
 #define memcpy                              FS_MEMCPY
 #define memset                              FS_MEMSET
+#define strncpy                             FS_STRNCPY
+#define strncmp                             FS_STRNCMP
+#define strlen(x)                           FS_SAFE_STRLEN(x, 0x1000)
 
 #define FS_MMC_SDCARD_STRUCT                ((vu32*)0x1089B9F8)
 #define FS_MMC_MLC_STRUCT                   ((vu32*)0x1089B948)
