@@ -32,13 +32,13 @@
 // Max FAT sectors to buffer (min 1)
 // (mem used is FAT_BUFFERS * FAT_BUFFER_SECTORS * FAT_SECTOR_SIZE)
 #ifndef FAT_BUFFERS
-    #define FAT_BUFFERS                     1
+    #define FAT_BUFFERS                     64
 #endif
 
 // Size of cluster chain cache (can be undefined)
 // Mem used = FAT_CLUSTER_CACHE_ENTRIES * 4 * 2
 // Improves access speed considerably
-//#define FAT_CLUSTER_CACHE_ENTRIES         128
+#define FAT_CLUSTER_CACHE_ENTRIES         128
 
 // Include support for writing files (1 / 0)?
 #ifndef FATFS_INC_WRITE_SUPPORT
