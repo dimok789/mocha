@@ -99,26 +99,26 @@ int _main()
 	kernel_memcpy((void*)USB_PHYS_CODE_BASE, payloads->data, payloads->size);
     payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
-    if(cfw_config.redNAND)
-    {
-        kernel_memcpy((void*)fs_get_phys_code_base(), payloads->data, payloads->size);
-        payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
+    //if(cfw_config.redNAND)
+    //{
+    kernel_memcpy((void*)fs_get_phys_code_base(), payloads->data, payloads->size);
+    payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
-        if(cfw_config.seeprom_red)
-        {
-            kernel_memcpy((void*)bsp_get_phys_code_base(), payloads->data, payloads->size);
-            payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
-        }
-    }
+    //    if(cfw_config.seeprom_red)
+    //    {
+    //        kernel_memcpy((void*)bsp_get_phys_code_base(), payloads->data, payloads->size);
+    //        payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
+    //    }
+    //}
 
 	kernel_memcpy((void*)mcp_get_phys_code_base(), payloads->data, payloads->size);
     payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
-    if(cfw_config.launchImage)
+    /*if(cfw_config.launchImage)
     {
 	    kernel_memcpy((void*)MCP_LAUNCH_IMG_PHYS_ADDR, payloads->data, payloads->size);
         payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
-    }
+    }*/
 
     // run all instant patches as necessary
     instant_patches_setup();
@@ -133,10 +133,10 @@ int _main()
 
 	enable_interrupts(level);
 
-    if(cfw_config.redNAND)
+    /*if(cfw_config.redNAND)
     {
 	    redirection_setup();
-    }
+    }*/
 
 	return 0;
 }

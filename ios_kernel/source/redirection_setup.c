@@ -59,7 +59,7 @@ void redirection_setup(void)
         }
     }
 
-    if(cfw_config.seeprom_red)
+    /*if(cfw_config.seeprom_red)
     {
         bsp_init_seeprom_buffer(seepromDumpBaseSector, seepromDumpFound);
 
@@ -83,7 +83,7 @@ void redirection_setup(void)
             infoSector->nand_descriptions[4].sector_count = 2;
             writeInfoSector++;
         }
-    }
+    }*/
 
     if(writeInfoSector > 0)
     {

@@ -36,8 +36,9 @@
 #include "dynamic_libs/socket_functions.h"
 #include "cfw_config.h"
 
-#define MAX_CONFIG_SETTINGS_EXPERT          9
-#define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
+#define MAX_CONFIG_SETTINGS 2
+//#define MAX_CONFIG_SETTINGS_EXPERT          9
+//#define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
 
 #define TEXT_SEL(x, text1, text2)           ((x) ? (text1) : (text2))
 
@@ -47,7 +48,7 @@ struct {
     const char *disabled;
 } selection_options[] =
 {
-    { "Config view mode", "expert", "default" },
+    /*{ "Config view mode", "expert", "default" },
     { "Skip this menu on launch", "on", "off" },
     { "Show launch image", "on", "off" },
     { "Don't relaunch OS", "on", "off" },
@@ -55,7 +56,10 @@ struct {
     { "redNAND", "on", "off" },
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
-    { "Use syshax.xml (coldboothax)", "on", "off" },
+    { "Use syshax.xml (coldboothax)", "on", "off" },*/
+    { "Dump SLC", "yes", "no" },
+    { "Dump SLCCMPT", "yes", "no" },
+    { "Dump MLC", "yes", "no" },
 };
 
 static void console_print_pos(int x, int y, const char *format, ...)
@@ -109,7 +113,7 @@ int ShowMenu(cfw_config_t * currentConfig)
     cfw_config_t config;
     memcpy(&config, currentConfig, sizeof(cfw_config_t));
 
-    int max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS_EXPERT : MAX_CONFIG_SETTINGS_DEFAULT;
+    int max_config_item = MAX_CONFIG_SETTINGS; //config.viewMode ? MAX_CONFIG_SETTINGS_EXPERT : MAX_CONFIG_SETTINGS_DEFAULT;
 
     while(1)
     {
@@ -149,6 +153,15 @@ int ShowMenu(cfw_config_t * currentConfig)
                 switch(selected)
                 {
                 case 0:
+                    config.dumpSlc = !config.dumpSlc;
+                    break;
+                case 1:
+                    config.dumpSlccmpt = !config.dumpSlccmpt;
+                    break;
+                case 2:
+                    config.dumpMlc = !config.dumpMlc;
+                    break;
+                /*case 0:
                     config.viewMode = !config.viewMode;
                     max_config_item = config.viewMode ? MAX_CONFIG_SETTINGS_EXPERT : MAX_CONFIG_SETTINGS_DEFAULT;
                     break;
@@ -175,12 +188,12 @@ int ShowMenu(cfw_config_t * currentConfig)
                     break;
                 case 8:
                     config.syshaxXml = !config.syshaxXml;
-                    break;
+                    break;*/
                 default:
                     break;
                 }
 
-                if(!config.viewMode)
+                /*if(!config.viewMode)
                 {
                     config.syshaxXml = 0;
 
@@ -204,7 +217,7 @@ int ShowMenu(cfw_config_t * currentConfig)
                 {
                     config.seeprom_red = 0;
                     config.otp_red = 0;
-                }
+                }*/
 
                 initScreen = 1;
             }
@@ -215,16 +228,16 @@ int ShowMenu(cfw_config_t * currentConfig)
             OSScreenClearBufferEx(0, 0);
             OSScreenClearBufferEx(1, 0);
 
-            console_print_pos(x_offset, 1, "                -- MOCHA CFW %s by Dimok --", APP_VERSION);
+            console_print_pos(x_offset, 1, "                -- NAND Dumper --");
 
             console_print_pos(x_offset, 3, "Select your options and press A to launch.");
             console_print_pos(x_offset, 4, "Press HOME to exit back to HBL.");
-            console_print_pos(x_offset, 5, "Hold B on start to force enter this menu");
+            //console_print_pos(x_offset, 5, "Hold B on start to force enter this menu");
 
             int y_offset = 6;
             int option_count = sizeof(selection_options) / sizeof(selection_options[0]);
             int idx;
-            int * configPtr = &config.viewMode;
+            int * configPtr = &config.dumpSlc;
 
             for(idx = 0; idx < option_count && idx < max_config_item; idx++)
             {
@@ -233,6 +246,7 @@ int ShowMenu(cfw_config_t * currentConfig)
                                   TEXT_SEL(configPtr[idx], " ", "<"), selection_options[idx].disabled, TEXT_SEL(configPtr[idx], " ", ">"));
             }
 
+            console_print_pos(x_offset, 15, "Based on mocha CFW by Dimok.");
             console_print_pos(x_offset, 16, "Credits go to everyone who contributed to Wii U scene publicly.");
             console_print_pos(x_offset, 17, "Special thanks to smealum, plutoo, yellows8, naehrwert and derrek.");
 
@@ -249,11 +263,11 @@ int ShowMenu(cfw_config_t * currentConfig)
     OSScreenShutdown();
     free(screenBuffer);
 
-    if(memcmp(currentConfig, &config, sizeof(cfw_config_t)) != 0)
+    /*if(memcmp(currentConfig, &config, sizeof(cfw_config_t)) != 0)
     {
         memcpy(currentConfig, &config, sizeof(cfw_config_t));
         write_config(currentConfig);
-    }
+    }*/
 
     return launch;
 }

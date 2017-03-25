@@ -232,11 +232,11 @@ int _startMainThread(void)
     {
         threadsStarted = 1;
 
-        int * launchImageConfigured = (int *)(0x05116000 - 4);
+        /*int * launchImageConfigured = (int *)(0x05116000 - 4);
         if(*launchImageConfigured != 0)
         {
             drawSplashScreen();
-        }
+        }*/
 
         int threadId = svcCreateThread(_main, 0, (u32*)(0x050BD000 + 0x1000), 0x1000, 0x78, 1);
         if(threadId >= 0)

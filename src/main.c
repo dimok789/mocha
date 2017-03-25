@@ -48,7 +48,7 @@ int Menu_Main(void)
     }
 
     VPADInit();
-    int forceMenu = 0;
+    /*int forceMenu = 0;
 
     {
         VPADData vpad;
@@ -59,20 +59,20 @@ int Menu_Main(void)
         {
             forceMenu = (vpad.btns_d | vpad.btns_h) & VPAD_BUTTON_B;
         }
-    }
+    }*/
 
-    mount_sd_fat("sd");
+    //mount_sd_fat("sd");
 
     cfw_config_t config;
     default_config(&config);
-    read_config(&config);
+    //read_config(&config);
 
     int launch = 1;
 
-    if(forceMenu || config.directLaunch == 0)
-    {
-        launch = ShowMenu(&config);
-    }
+    //if(forceMenu || config.directLaunch == 0)
+    //{
+    launch = ShowMenu(&config);
+    //}
 
     int returnCode = 0;
 
@@ -81,22 +81,22 @@ int Menu_Main(void)
         int res = ExecuteIOSExploit(&config);
         if(res == 0)
         {
-            if(config.noIosReload == 0)
-            {
-                OSForceFullRelaunch();
-                SYSLaunchMenu();
-                returnCode = EXIT_RELAUNCH_ON_LOAD;
-            }
-            else if(config.launchSysMenu)
-            {
-                SYSLaunchMenu();
-                exitToHBLOnLaunch = 1;
-                returnCode = EXIT_RELAUNCH_ON_LOAD;
-            }
+            //if(config.noIosReload == 0)
+            //{
+			OSForceFullRelaunch();
+			SYSLaunchMenu();
+			returnCode = EXIT_RELAUNCH_ON_LOAD;
+            //}
+            //else if(config.launchSysMenu)
+            //{
+            //    SYSLaunchMenu();
+            //    exitToHBLOnLaunch = 1;
+            //    returnCode = EXIT_RELAUNCH_ON_LOAD;
+            //}
         }
     }
 
-    unmount_sd_fat("sd");
+    //unmount_sd_fat("sd");
 
     return returnCode;
 }

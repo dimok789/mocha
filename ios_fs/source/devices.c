@@ -5,6 +5,10 @@
 #include "sdio.h"
 #include "text.h"
 
+extern char io_buffer_spare[0x42000];
+extern unsigned long io_buffer_spare_pos;
+extern int io_buffer_spare_status;
+
 void * getMdDeviceById(int deviceId)
 {
     if(deviceId == DEVICE_ID_SDCARD_PATCHED)
@@ -146,5 +150,18 @@ int slcRead2_patch(void *physical_device_info, u32 offset_high, u32 offset_low, 
 int slcWrite2_patch(void *physical_device_info, u32 offset_high, u32 offset_low, u32 cnt, u32 block_size, int ukn1, void *data_outptr, int ukn2, read_write_callback_t callback, int callback_parameter)
 {
     return slcReadWrite_patch(physical_device_info, SDIO_WRITE, offset_low, cnt, block_size, data_outptr, callback, callback_parameter);
+}
+
+int eccCheck_patch(void *buffer, char* spare_ecc, char* calculated_ecc, int ecc_length)
+{
+	if (io_buffer_spare_status || io_buffer_spare_pos > sizeof(io_buffer_spare) || io_buffer_spare_pos+0x840 > sizeof(io_buffer_spare)) {
+		io_buffer_spare_status = -1;
+		return 0;
+	}
+	memcpy(io_buffer_spare+io_buffer_spare_pos, buffer, 0x800);
+	io_buffer_spare_pos += 0x800;
+	memcpy(io_buffer_spare+io_buffer_spare_pos, spare_ecc - 0x30, 0x40);
+	io_buffer_spare_pos += 0x40;
+    return 0;
 }
 

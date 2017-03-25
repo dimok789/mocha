@@ -48,7 +48,7 @@ void instant_patches_setup(void)
 	*(volatile u32*)0x1070FAE8 = 0x05812070;
 	*(volatile u32*)0x1070FAEC = 0xEAFFFFF9;
 
-    if(cfw_config.noIosReload)
+    /*if(cfw_config.noIosReload)
     {
         int (*_iosMapSharedUserExecution)(void *descr) = (void*)0x08124F88;
 
@@ -98,5 +98,5 @@ void instant_patches_setup(void)
         map_info.type = 3;              // 0 = undefined, 1 = kernel only, 2 = read only, 3 = read write
         map_info.cached = 0xFFFFFFFF;
         _iosMapSharedUserExecution(&map_info);
-    }
+    }*/
 }

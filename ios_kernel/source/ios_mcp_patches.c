@@ -46,13 +46,13 @@ void mcp_run_patches(u32 ios_elf_start)
 
     section_write_word(ios_elf_start, 0x05056718, ARM_BL(0x05056718, _text_start));
 
-    if(cfw_config.syshaxXml)
+    /*if(cfw_config.syshaxXml)
     {
         section_write(ios_elf_start, 0x050600DC, "/vol/system/config/syshax.xml", 0x20);
         section_write(ios_elf_start, 0x050600FC, "/vol/system_slc/config/syshax.xml", 0x24);
-    }
+    }*/
 
-    section_write_word(ios_elf_start, (_text_start - 4), cfw_config.launchImage);
+    //section_write_word(ios_elf_start, (_text_start - 4), cfw_config.launchImage);
 
     u32 patch_count = (u32)(((u8*)mcp_patches_table_end) - ((u8*)mcp_patches_table)) / sizeof(patch_table_t);
     patch_table_entries(ios_elf_start, mcp_patches_table, patch_count);

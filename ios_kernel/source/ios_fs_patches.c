@@ -24,6 +24,7 @@
 #include "types.h"
 #include "elf_patcher.h"
 #include "ios_fs_patches.h"
+#include "config.h"
 #include "../../ios_fs/ios_fs_syms.h"
 
 #define FS_PHYS_DIFF                                0
@@ -39,6 +40,7 @@
 #define FS_SLC_READ2                                0x107B98FC
 #define FS_SLC_WRITE1                               0x107B9870
 #define FS_SLC_WRITE2                               0x107B97E4
+#define FS_SLC_ECC_CHECK                            0x107BAD38
 #define FS_MLC_READ1                                0x107DC760
 #define FS_MLC_READ2                                0x107DCDE4
 #define FS_MLC_WRITE1                               0x107DC0C0
@@ -73,6 +75,12 @@ void fs_run_patches(u32 ios_elf_start)
     section_write_word(ios_elf_start, FS_SLC_READ2, ARM_B(FS_SLC_READ2, slcRead2_patch));
     section_write_word(ios_elf_start, FS_SLC_WRITE1, ARM_B(FS_SLC_WRITE1, slcWrite1_patch));
     section_write_word(ios_elf_start, FS_SLC_WRITE2, ARM_B(FS_SLC_WRITE2, slcWrite2_patch));
+
+    section_write_word(ios_elf_start, FS_SLC_ECC_CHECK, ARM_B(FS_SLC_ECC_CHECK, eccCheck_patch));
+
+    section_write_word(ios_elf_start, (_text_start - 4), cfw_config.dumpSlc);
+    section_write_word(ios_elf_start, (_text_start - 8), cfw_config.dumpSlccmpt);
+    section_write_word(ios_elf_start, (_text_start - 12), cfw_config.dumpMlc);
 
     //section_write_word(ios_elf_start, FS_USB_READ, ARM_B(FS_USB_READ, usbRead_patch));
     //section_write_word(ios_elf_start, FS_USB_WRITE, ARM_B(FS_USB_WRITE, usbWrite_patch));

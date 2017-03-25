@@ -24,25 +24,28 @@
 #ifndef CFW_CONFIG_H_
 #define CFW_CONFIG_H_
 
-#define APP_VERSION         "v0.2"
-#define APP_PATH            "sd:/wiiu/apps/mocha"
-#define CONFIG_PATH         (APP_PATH "/config.ini")
+//#define APP_VERSION         "v0.2"
+//#define APP_PATH            "sd:/wiiu/apps/mocha"
+//#define CONFIG_PATH         (APP_PATH "/config.ini")
 
 typedef struct
 {
-    int viewMode;
-    int directLaunch;
-    int launchImage;
-    int noIosReload;
-    int launchSysMenu;
-    int redNAND;
-    int seeprom_red;
-    int otp_red;
-    int syshaxXml;
+    //int viewMode;
+    //int directLaunch;
+    //int launchImage;
+    //int noIosReload;
+    //int launchSysMenu;
+    //int redNAND;
+    //int seeprom_red;
+    //int otp_red;
+    //int syshaxXml;
+    int dumpSlc;
+    int dumpSlccmpt;
+    int dumpMlc;
 } cfw_config_t;
 
 void default_config(cfw_config_t * config);
-int read_config(cfw_config_t * config);
-int write_config(cfw_config_t * config);
+//int read_config(cfw_config_t * config);
+//int write_config(cfw_config_t * config);
 
 #endif

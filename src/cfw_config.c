@@ -76,18 +76,21 @@ static int split_string(const char *string, char splitChar, char *left, char *ri
 void default_config(cfw_config_t * config)
 {
     memset(config, 0, sizeof(cfw_config_t));
-    config->viewMode = 0;
-    config->directLaunch = 0;
-    config->launchImage = 1;
-    config->noIosReload = 0;
-    config->launchSysMenu = 1;
-    config->redNAND = 0;
-    config->seeprom_red = 0;
-    config->otp_red = 0;
-    config->syshaxXml = 0;
+    //config->viewMode = 0;
+    //config->directLaunch = 0;
+    //config->launchImage = 1;
+    //config->noIosReload = 0;
+    //config->launchSysMenu = 1;
+    //config->redNAND = 0;
+    //config->seeprom_red = 0;
+    //config->otp_red = 0;
+    //config->syshaxXml = 0;
+    config->dumpSlc = 1;
+    config->dumpSlccmpt = 1;
+    config->dumpMlc = 0;
 }
 
-int read_config(cfw_config_t * config)
+/*int read_config(cfw_config_t * config)
 {
     FILE *pFile = fopen(CONFIG_PATH, "rb");
     if(!pFile)
@@ -127,9 +130,9 @@ int read_config(cfw_config_t * config)
 
     fclose(pFile);
     return 0;
-}
+}*/
 
-int write_config(cfw_config_t * config)
+/*int write_config(cfw_config_t * config)
 {
     CreateSubfolder(APP_PATH);
 
@@ -149,4 +152,4 @@ int write_config(cfw_config_t * config)
     fprintf(pFile, "syshaxXml=%i\n", config->syshaxXml);
     fclose(pFile);
     return 0;
-}
+}*/

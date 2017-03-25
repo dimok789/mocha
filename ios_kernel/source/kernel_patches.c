@@ -102,13 +102,13 @@ void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
         mcp_run_patches(ios_elf_start);
         kernel_run_patches(ios_elf_start);
 
-        if(cfw_config.redNAND)
-        {
-            fs_run_patches(ios_elf_start);
+        //if(cfw_config.redNAND)
+        //{
+        fs_run_patches(ios_elf_start);
 
-            if(cfw_config.seeprom_red)
-                bsp_run_patches(ios_elf_start);
-        }
+        //    if(cfw_config.seeprom_red)
+        //        bsp_run_patches(ios_elf_start);
+        //}
 
         restore_mmu(control_register);
         enable_interrupts(level);
@@ -130,11 +130,11 @@ void kernel_run_patches(u32 ios_elf_start)
 
     section_write_word(ios_elf_start, 0x0812CD2C, ARM_B(0x0812CD2C, kernel_syscall_0x81));
 
-    if(cfw_config.redNAND && cfw_config.otp_red)
+    /*if(cfw_config.redNAND && cfw_config.otp_red)
     {
         section_write(ios_elf_start, (u32)otp_buffer, otp_buffer, 0x400);
         section_write_word(ios_elf_start, 0x08120248, ARM_B(0x08120248, kernel_read_otp_internal));
-    }
+    }*/
 
     u32 patch_count = (u32)(((u8*)kernel_patches_table_end) - ((u8*)kernel_patches_table)) / sizeof(patch_table_t);
     patch_table_entries(ios_elf_start, kernel_patches_table, patch_count);

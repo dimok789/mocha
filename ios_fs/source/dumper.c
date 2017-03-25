@@ -4,13 +4,19 @@
 #include "devices.h"
 #include "sdio.h"
 #include "mlcio.h"
-#include "fat32_format.h"
+#include "sd_fat.h"
 #include "text.h"
 #include "hardware_registers.h"
 #include "svc.h"
 
+#define IO_BUFFER_SIZE 0x40000
+#define IO_BUFFER_SPARE_SIZE (IO_BUFFER_SIZE+0x2000)
+
 // the IO buffer is put behind everything else because there is no access to this region from IOS-FS it seems
-unsigned char io_buffer[0x40000]  __attribute__((aligned(0x40))) __attribute__((section(".io_buffer")));
+unsigned char io_buffer[IO_BUFFER_SIZE]  __attribute__((aligned(0x40))) __attribute__((section(".io_buffer")));
+unsigned char io_buffer_spare[IO_BUFFER_SPARE_SIZE]  __attribute__((aligned(0x40))) __attribute__((section(".io_buffer")));
+unsigned long io_buffer_spare_pos;
+int io_buffer_spare_status;
 
 //! this one is required for the read function
 static void slc_read_callback(int result, int priv)
@@ -32,7 +38,7 @@ static int srcRead(void* deviceHandle, void *data_ptr, u32 offset, u32 sectors, 
     return readResult;
 }
 
-void slc_dump(void *deviceHandle, const char* device, u32 base_sectors, int y_offset)
+int slc_dump(void *deviceHandle, const char* device, const char* filename, int y_offset)
 {
 	//also create a mutex for synchronization with end of operation...
     int sync_mutex = FS_SVC_CREATEMUTEX(1, 1);
@@ -44,66 +50,54 @@ void slc_dump(void *deviceHandle, const char* device, u32 base_sectors, int y_of
     u32 offset = 0;
     int readResult = 0;
     int writeResult = 0;
-    int retry = 0;
-    u32 readSize = sizeof(io_buffer) / SLC_BYTES_PER_SECTOR;
+    int result = -1;
+    u32 readSize = IO_BUFFER_SPARE_SIZE / SLC_BYTES_PER_SECTOR;
 
     FS_SLEEP(1000);
 
+    FL_FILE *file = fl_fopen(filename, "w");
+	if (!file) {
+        _printf(20, y_offset, "Failed to open %s for writing", filename);
+		goto error;
+	}
+
     do
     {
-        // don't print single steps in between, just if they have an error or every 0x80 sectors
-        if((readSize == (sizeof(io_buffer) / SLC_BYTES_PER_SECTOR)) || (retry > 0))
-        {
-            _printf(20, y_offset, "%s     = %08X / 40000, read code %08X, write code %08X, retry %d", device, offset, readResult, writeResult, retry);
-        }
+		_printf(20, y_offset, "%s     = %05X / 40000", device, offset);
 
         //! set flash erased byte to buffer
-        FS_MEMSET(io_buffer, 0xff, sizeof(io_buffer));
+        FS_MEMSET(io_buffer_spare, 0xff, IO_BUFFER_SPARE_SIZE);
+		io_buffer_spare_status = 0;
+		io_buffer_spare_pos = 0;
         //readResult = readSlc(io_buffer, offset, (sizeof(io_buffer) / SLC_BYTES_PER_SECTOR), deviceHandle);
         readResult = srcRead(deviceHandle, io_buffer, offset, readSize, result_array);
 
-        //! retry 2 times as there are read failures in several places
-        if((readResult != 0) && (retry < 2))
-        {
-            readSize = 1;
-            FS_SLEEP(10);
-            retry++;
-        }
-        else
-        {
-            retry = 0;
-
-            while(1)
-            {
-                FS_SLEEP(10);
-
-                writeResult = sdcard_readwrite(SDIO_WRITE, io_buffer, (readSize * (SLC_BYTES_PER_SECTOR / SDIO_BYTES_PER_SECTOR)), SDIO_BYTES_PER_SECTOR, base_sectors, NULL, DEVICE_ID_SDCARD_PATCHED);
-                if((writeResult == 0) || (retry >= 2))
-                {
-                    retry = 0;
-                    base_sectors += (readSize * (SLC_BYTES_PER_SECTOR / SDIO_BYTES_PER_SECTOR));
-                    offset += readSize;
-
-                    // if we did single sector reads and got to a point where we can do multiple reads -> switch to multiple sector reads
-                    if((offset % (sizeof(io_buffer) / SLC_BYTES_PER_SECTOR)) == 0)
-                    {
-                        readSize = sizeof(io_buffer) / SLC_BYTES_PER_SECTOR;
-                    }
-                    break;
-                }
-                else
-                {
-                    retry++;
-                }
-            }
-        }
+		if (readResult || io_buffer_spare_status || io_buffer_spare_pos != IO_BUFFER_SPARE_SIZE) {
+			
+			_printf(20, y_offset+10, "Failed to read flash block. read result: 0x%08X spare status: 0x%08X spare pos: 0x%08X", readResult, io_buffer_spare_status, io_buffer_spare_pos);
+			goto error;
+		}
+		//FS_SLEEP(10);
+		writeResult = fl_fwrite(io_buffer_spare, 1, readSize * SLC_BYTES_PER_SECTOR, file);
+		if (writeResult != readSize * SLC_BYTES_PER_SECTOR) {
+			_printf(20, y_offset + 10, "%s: Failed to write %d bytes to file %s (result: %d)!", device, readSize * SLC_BYTES_PER_SECTOR, file, filename, writeResult);
+			goto error;
+		}
+		offset += readSize;
     }
     while (offset < SLC_SECTOR_COUNT);
 
+	result = 0;
+
+	error:
     FS_SVC_DESTROYMUTEX(sync_mutex);
 
+	if (file) {
+		fl_fclose(file);
+	}
     // last print to show "done"
-    _printf(20, y_offset, "%s     = %08X / 40000, read code %08X, write code %08X, retry %d", device, offset, readResult, writeResult, retry);
+    _printf(20, y_offset, "%s     = %05X / 40000", device, offset);
+	return result;
 }
 
 void mlc_dump(u32 base_sector, u32 mlc_end)
@@ -130,8 +124,8 @@ void mlc_dump(u32 base_sector, u32 mlc_end)
         }
 
         //! set flash erased byte to buffer
-        FS_MEMSET(io_buffer, 0xff, sizeof(io_buffer));
-        mlc_result = sdcard_readwrite(SDIO_READ, io_buffer, (sizeof(io_buffer) / MLC_BYTES_PER_SECTOR), MLC_BYTES_PER_SECTOR, offset, &callback_result, DEVICE_ID_MLC);
+        FS_MEMSET(io_buffer, 0xff, IO_BUFFER_SIZE);
+        mlc_result = sdcard_readwrite(SDIO_READ, io_buffer, (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR), MLC_BYTES_PER_SECTOR, offset, &callback_result, DEVICE_ID_MLC);
 
         if((mlc_result == 0) && (callback_result != 0))
         {
@@ -147,11 +141,11 @@ void mlc_dump(u32 base_sector, u32 mlc_end)
         }
         else
         {
-            write_result = sdcard_readwrite(SDIO_WRITE, io_buffer, (sizeof(io_buffer) / MLC_BYTES_PER_SECTOR), SDIO_BYTES_PER_SECTOR, base_sector + offset, NULL, DEVICE_ID_SDCARD_PATCHED);
+            write_result = sdcard_readwrite(SDIO_WRITE, io_buffer, (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR), SDIO_BYTES_PER_SECTOR, base_sector + offset, NULL, DEVICE_ID_SDCARD_PATCHED);
             if((write_result == 0) || (retry >= 5))
             {
                 retry = 0;
-                offset += (sizeof(io_buffer) / MLC_BYTES_PER_SECTOR);
+                offset += (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR);
             }
             else
             {
@@ -180,24 +174,7 @@ int check_nand_type(void)
     }
 }
 
-int check_nand_dump(void)
-{
-    u32 mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
-
-    int signature_correct = 0;
-    sdio_nand_signature_sector_t * sign_sect = (sdio_nand_signature_sector_t*)io_buffer;
-    memset(sign_sect, 0, SDIO_BYTES_PER_SECTOR);
-    sdcard_readwrite(SDIO_READ, sign_sect, 1, SDIO_BYTES_PER_SECTOR, NAND_DUMP_SIGNATURE_SECTOR, NULL, DEVICE_ID_SDCARD_PATCHED);
-
-    signature_correct = (sign_sect->signature == NAND_DUMP_SIGNATURE);
-
-    memset(io_buffer, 0, SDIO_BYTES_PER_SECTOR);
-    sdcard_readwrite(SDIO_READ, io_buffer, 1, SDIO_BYTES_PER_SECTOR, 0, NULL, DEVICE_ID_SDCARD_PATCHED);
-
-    return signature_correct && CheckFAT32PartitionOffset(io_buffer, MLC_BASE_SECTORS + mlc_sector_count);
-}
-
-static void wait_format_confirmation(void)
+/*static void wait_format_confirmation(void)
 {
     int timeout = 600;
     //"Press the POWER button SD then , else the console will reboot in %u seconds."
@@ -223,16 +200,23 @@ static void wait_format_confirmation(void)
     // clear the lines
     clearLine(30, 0x000000FF);
     clearLine(40, 0x000000FF);
-}
+}*/
 
 void dump_nand_complete()
 {
-    wait_format_confirmation();
+    _printf(20, 30, "Init SD card....");
+	if ( InitSDCardFAT32() != 0 ) {
+        FS_SLEEP(3000);
+        svcShutdown(SHUTDOWN_TYPE_REBOOT);
+	}
+    _printf(20, 30, "Init SD card.... Success!");
 
-    mlc_init();
+    //wait_format_confirmation();
+
+    //mlc_init();
     FS_SLEEP(1000);
 
-    int nand_type = check_nand_type();
+    /*int nand_type = check_nand_type();
     u32 sdio_sector_count = FS_MMC_SDCARD_STRUCT[0x30/4];
     u32 mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
     u32 fat32_partition_offset = (MLC_BASE_SECTORS + mlc_sector_count);
@@ -250,30 +234,35 @@ void dump_nand_complete()
     {
         FS_SLEEP(3000);
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
-    }
+    }*/
 
-    slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", SLC_BASE_SECTORS, 50);
-    slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", SLCCMPT_BASE_SECTORS, 60);
-    mlc_dump(MLC_BASE_SECTORS, mlc_sector_count);
-
-    //! write marker to SD card from which we can auto detect NAND dump
-    //! we can actually use that for settings
-    sdio_nand_signature_sector_t * sign_sect = (sdio_nand_signature_sector_t*)io_buffer;
-    memset(sign_sect, 0, SDIO_BYTES_PER_SECTOR);
-    sign_sect->signature = NAND_DUMP_SIGNATURE;
-    sign_sect->nand_descriptions[0].nand_type = NAND_DESC_TYPE_SLC;
-    sign_sect->nand_descriptions[0].base_sector = SLC_BASE_SECTORS;
-    sign_sect->nand_descriptions[0].sector_count = SLC_SECTOR_COUNT * (SLC_BYTES_PER_SECTOR / SDIO_BYTES_PER_SECTOR);
-    sign_sect->nand_descriptions[1].nand_type = NAND_DESC_TYPE_SLCCMPT;
-    sign_sect->nand_descriptions[1].base_sector = SLCCMPT_BASE_SECTORS;
-    sign_sect->nand_descriptions[1].sector_count = SLC_SECTOR_COUNT * (SLC_BYTES_PER_SECTOR / SDIO_BYTES_PER_SECTOR);
-    sign_sect->nand_descriptions[2].nand_type = NAND_DESC_TYPE_MLC;
-    sign_sect->nand_descriptions[2].base_sector = MLC_BASE_SECTORS;
-    sign_sect->nand_descriptions[2].sector_count = mlc_sector_count * (MLC_BYTES_PER_SECTOR / SDIO_BYTES_PER_SECTOR);
-
-    sdcard_readwrite(SDIO_WRITE, io_buffer, 1, SDIO_BYTES_PER_SECTOR, NAND_DUMP_SIGNATURE_SECTOR, NULL, DEVICE_ID_SDCARD_PATCHED);
+	int * dumpSlc =  (int *)(0x107f8200 - 4);
+	int * dumpSlccmpt =  (int *)(0x107f8200 - 8);
+	int * dumpMlc =  (int *)(0x107f8200 - 12);
+	int offset_y = 50;
+	if (*dumpSlc) {
+		if (slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", "/slc.bin", offset_y))
+			goto error;
+		offset_y += 10;
+	}
+	if (*dumpSlccmpt) {
+		if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", 60))
+			goto error;
+		offset_y += 10;
+	}
+	if (*dumpMlc) {
+		// TODO
+		//mlc_dump(MLC_BASE_SECTORS, mlc_sector_count);
+		offset_y += 10;
+	}
 
     _printf(20, 80, "Complete! -> rebooting into sysNAND...");
+
+    FS_SLEEP(3000);
+    svcShutdown(SHUTDOWN_TYPE_REBOOT);
+
+	error:
+    _printf(20, 80, "Error! -> rebooting into sysNAND...");
 
     FS_SLEEP(3000);
     svcShutdown(SHUTDOWN_TYPE_REBOOT);

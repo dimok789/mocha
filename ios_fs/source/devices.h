@@ -10,7 +10,7 @@
 
 #define SDIO_BYTES_PER_SECTOR               512
 #define MLC_BYTES_PER_SECTOR                512
-#define SLC_BYTES_PER_SECTOR                2048
+#define SLC_BYTES_PER_SECTOR                (2048+64)
 
 #define SLC_BASE_SECTORS                    (0x000500)
 #define SLCCMPT_BASE_SECTORS                (0x100500)
