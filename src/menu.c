@@ -36,7 +36,7 @@
 #include "dynamic_libs/socket_functions.h"
 #include "cfw_config.h"
 
-#define MAX_CONFIG_SETTINGS 2
+#define MAX_CONFIG_SETTINGS 3
 //#define MAX_CONFIG_SETTINGS_EXPERT          9
 //#define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
 

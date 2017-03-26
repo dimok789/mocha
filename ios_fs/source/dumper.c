@@ -89,7 +89,7 @@ int slc_dump(void *deviceHandle, const char* device, const char* filename, int y
 
 	result = 0;
 
-	error:
+error:
     FS_SVC_DESTROYMUTEX(sync_mutex);
 
 	if (file) {
@@ -100,23 +100,37 @@ int slc_dump(void *deviceHandle, const char* device, const char* filename, int y
 	return result;
 }
 
-void mlc_dump(u32 base_sector, u32 mlc_end)
+int mlc_dump(u32 mlc_end, int y_offset)
 {
     u32 offset = 0;
 
+	int result = -1;
     int retry = 0;
     int mlc_result = 0;
     int callback_result = 0;
     int write_result = 0;
     int print_counter = 0;
+	int current_file_index = 0;
 
+
+	char filename[40];
+    FL_FILE *file = NULL;
+	
     do
     {
+		if (!file) {
+			FS_SNPRINTF(filename, sizeof(filename), "/mlc.bin.part%02d", ++current_file_index);
+			file = fl_fopen(filename, "w");
+			if (!file) {
+				_printf(20, y_offset, "Failed to open %s for writing", filename);
+				goto error;
+			}
+		}
         //! print only every 4th time
         if(print_counter == 0)
         {
             print_counter = 4;
-            _printf(20, 70, "mlc         = %08X / %08X, mlc res %08X, sd res %08X, retry %d", offset, mlc_end, mlc_result, write_result, retry);
+            _printf(20, y_offset, "mlc         = %08X / %08X, mlc res %08X, retry %d", offset, mlc_end, mlc_result, retry);
         }
         else
         {
@@ -141,24 +155,30 @@ void mlc_dump(u32 base_sector, u32 mlc_end)
         }
         else
         {
-            write_result = sdcard_readwrite(SDIO_WRITE, io_buffer, (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR), SDIO_BYTES_PER_SECTOR, base_sector + offset, NULL, DEVICE_ID_SDCARD_PATCHED);
-            if((write_result == 0) || (retry >= 5))
-            {
-                retry = 0;
-                offset += (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR);
-            }
-            else
-            {
-                FS_SLEEP(100);
-                retry++;
-                print_counter = 0; // print errors directly
-            }
+			write_result = fl_fwrite(io_buffer, 1, IO_BUFFER_SIZE, file);
+			if (write_result != IO_BUFFER_SIZE) {
+				_printf(20, y_offset + 10, "mlc: Failed to write %d bytes to file %s (result: %d)!", IO_BUFFER_SIZE, file, filename, write_result);
+				goto error;
+			}
+			offset += (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR);
+			if ((offset % 0x400000) == 0) {
+				fl_fclose(file);
+				file = NULL;
+			}
         }
     }
-    while(offset < mlc_end); //! TODO: make define MLC32_SECTOR_COUNT
+    while(offset < mlc_end); //! TODO: make define MLC32_SECTOR_COUNT:
 
+	result = 0;
+
+error:
+	if (file) {
+		fl_fclose(file);
+	}
     // last print to show "done"
-    _printf(20, 70, "mlc     = %08X / %08X, mlc res %08X, sd res %08X, retry %d", offset, mlc_end, mlc_result, write_result, retry);
+    _printf(20, y_offset, "mlc         = %08X / %08X, mlc res %08X, retry %d", offset, mlc_end, mlc_result, retry);
+
+	return result;
 }
 
 int check_nand_type(void)
@@ -204,26 +224,38 @@ int check_nand_type(void)
 
 void dump_nand_complete()
 {
-    _printf(20, 30, "Init SD card....");
+	int offset_y = 30;
+    _printf(20, offset_y, "Init SD card....");
 	if ( InitSDCardFAT32() != 0 ) {
         FS_SLEEP(3000);
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
 	}
-    _printf(20, 30, "Init SD card.... Success!");
+    _printf(20, offset_y, "Init SD card.... Success!");
+	offset_y += 10;
+
+	int * dumpSlc =  (int *)(0x107f8200 - 4);
+	int * dumpSlccmpt =  (int *)(0x107f8200 - 8);
+	int * dumpMlc =  (int *)(0x107f8200 - 12);
+
 
     //wait_format_confirmation();
 
-    //mlc_init();
-    FS_SLEEP(1000);
+	u32 mlc_sector_count = 0;
+	if (*dumpMlc) {
+		mlc_init();
+		FS_SLEEP(1000);
 
-    /*int nand_type = check_nand_type();
-    u32 sdio_sector_count = FS_MMC_SDCARD_STRUCT[0x30/4];
-    u32 mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
-    u32 fat32_partition_offset = (MLC_BASE_SECTORS + mlc_sector_count);
+		int nand_type = check_nand_type();
+		//u32 sdio_sector_count = FS_MMC_SDCARD_STRUCT[0x30/4];
+		mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
+		//u32 fat32_partition_offset = (MLC_BASE_SECTORS + mlc_sector_count);
 
-    _printf(20, 30, "Detected %d GB MLC NAND type.", (nand_type == MLC_NAND_TYPE_8GB) ? 8 : 32);
+		_printf(20, offset_y, "Detected %d GB MLC NAND type.", (nand_type == MLC_NAND_TYPE_8GB) ? 8 : 32);
+		offset_y += 10;
+	}
+	offset_y += 10;
 
-    if(sdio_sector_count < fat32_partition_offset)
+    /*if(sdio_sector_count < fat32_partition_offset)
     {
         _printf(20, 40, "SD card too small! Required sectors %u > available %u.", fat32_partition_offset, sdio_sector_count);
         FS_SLEEP(3000);
@@ -236,33 +268,31 @@ void dump_nand_complete()
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
     }*/
 
-	int * dumpSlc =  (int *)(0x107f8200 - 4);
-	int * dumpSlccmpt =  (int *)(0x107f8200 - 8);
-	int * dumpMlc =  (int *)(0x107f8200 - 12);
-	int offset_y = 50;
 	if (*dumpSlc) {
 		if (slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", "/slc.bin", offset_y))
 			goto error;
 		offset_y += 10;
 	}
 	if (*dumpSlccmpt) {
-		if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", 60))
+		if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", offset_y))
 			goto error;
 		offset_y += 10;
 	}
 	if (*dumpMlc) {
-		// TODO
-		//mlc_dump(MLC_BASE_SECTORS, mlc_sector_count);
+		if (mlc_dump(mlc_sector_count, offset_y))
+			goto error;
 		offset_y += 10;
 	}
+	offset_y += 20;
 
-    _printf(20, 80, "Complete! -> rebooting into sysNAND...");
+    _printf(20, offset_y, "Complete! -> rebooting into sysNAND...");
 
     FS_SLEEP(3000);
     svcShutdown(SHUTDOWN_TYPE_REBOOT);
 
-	error:
-    _printf(20, 80, "Error! -> rebooting into sysNAND...");
+error:
+	offset_y += 20;
+    _printf(20, offset_y, "Error! -> rebooting into sysNAND...");
 
     FS_SLEEP(3000);
     svcShutdown(SHUTDOWN_TYPE_REBOOT);
