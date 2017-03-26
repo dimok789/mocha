@@ -131,6 +131,7 @@ int fatfs_init(struct fatfs *fs)
 
     // For FAT32 (which this may be)
     fs->rootdir_first_cluster = GET_32BIT_WORD(fs->currentsector.sector, BPB_FAT32_ROOTCLUS);
+    fs->last_free_cluster = fs->rootdir_first_cluster + 1;
     fs->fs_info_sector = GET_16BIT_WORD(fs->currentsector.sector, BPB_FAT32_FSINFO);
 
     // For FAT16 (which this may be), rootdir_first_cluster is actuall rootdir_first_sector

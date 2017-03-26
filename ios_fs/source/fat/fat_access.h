@@ -60,6 +60,7 @@ struct fatfs
     uint8                   sectors_per_cluster;
     uint32                  cluster_begin_lba;
     uint32                  rootdir_first_cluster;
+    uint32                  last_free_cluster;
     uint32                  rootdir_first_sector;
     uint32                  rootdir_sectors;
     uint32                  fat_begin_lba;

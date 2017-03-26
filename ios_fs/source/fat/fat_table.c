@@ -337,6 +337,7 @@ int fatfs_find_blank_cluster(struct fatfs *fs, uint32 start_cluster, uint32 *fre
     while (nextcluster != 0x0);
 
     // Found blank entry
+	fs->last_free_cluster = current_cluster + 1;
     *free_cluster = current_cluster;
     return 1;
 }
