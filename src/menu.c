@@ -57,8 +57,8 @@ struct {
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
     { "Use syshax.xml (coldboothax)", "on", "off" },*/
-    { "Dump SLC (512MB)", "yes", "no" },
-    { "Dump SLCCMPT (512MB)", "yes", "no" },
+    { "Dump SLC (528MB)", "yes", "no" },
+    { "Dump SLCCMPT (528MB)", "yes", "no" },
     { "Dump MLC (8GB/32GB)", "yes", "no" },
     { "Dump OTP (1KB)", "yes", "no" },
     { "Dump SEEPROM (1KB)", "yes", "no" },
