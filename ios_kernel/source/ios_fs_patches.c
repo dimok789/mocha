@@ -63,7 +63,7 @@ u32 fs_get_phys_code_base(void)
 
 void fs_run_patches(u32 ios_elf_start)
 {
-	fs_config config;
+    fs_config config;
 
     // write wupserver code and bss
     section_write(ios_elf_start, _text_start, (void*)fs_get_phys_code_base(), _text_end - _text_start);
@@ -85,15 +85,15 @@ void fs_run_patches(u32 ios_elf_start)
 
     section_write_word(ios_elf_start, FS_SLC_ECC_CHECK, ARM_B(FS_SLC_ECC_CHECK, eccCheck_patch));
 
-	config.dump_slc = cfw_config.dumpSlc;
-	config.dump_slccmpt = cfw_config.dumpSlccmpt;
-	config.dump_mlc = cfw_config.dumpMlc;
-	config.dump_otp = cfw_config.dumpOtp;
-	config.dump_seeprom = cfw_config.dumpSeeprom;
-	if (cfw_config.dumpOtp)
-		kernel_memcpy(config.otp_buffer, otp_buffer, sizeof(config.otp_buffer));
-	if (cfw_config.dumpSeeprom)
-		kernel_memcpy(config.seeprom_buffer, seeprom_buffer, sizeof(config.seeprom_buffer));
+    config.dump_slc = cfw_config.dumpSlc;
+    config.dump_slccmpt = cfw_config.dumpSlccmpt;
+    config.dump_mlc = cfw_config.dumpMlc;
+    config.dump_otp = cfw_config.dumpOtp;
+    config.dump_seeprom = cfw_config.dumpSeeprom;
+    if (cfw_config.dumpOtp)
+        kernel_memcpy(config.otp_buffer, otp_buffer, sizeof(config.otp_buffer));
+    if (cfw_config.dumpSeeprom)
+        kernel_memcpy(config.seeprom_buffer, seeprom_buffer, sizeof(config.seeprom_buffer));
     section_write(ios_elf_start, dumper_config, &config, sizeof(config));
 
     //section_write_word(ios_elf_start, FS_USB_READ, ARM_B(FS_USB_READ, usbRead_patch));

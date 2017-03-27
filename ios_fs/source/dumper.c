@@ -43,7 +43,7 @@ static int srcRead(void* deviceHandle, void *data_ptr, u32 offset, u32 sectors, 
 
 int slc_dump(void *deviceHandle, const char* device, const char* filename, int y_offset)
 {
-	//also create a mutex for synchronization with end of operation...
+    //also create a mutex for synchronization with end of operation...
     int sync_mutex = FS_SVC_CREATEMUTEX(1, 1);
     FS_SVC_ACQUIREMUTEX(sync_mutex, 0);
 
@@ -59,76 +59,76 @@ int slc_dump(void *deviceHandle, const char* device, const char* filename, int y
     FS_SLEEP(1000);
 
     FL_FILE *file = fl_fopen(filename, "w");
-	if (!file) {
+    if (!file) {
         _printf(20, y_offset, "Failed to open %s for writing", filename);
-		goto error;
-	}
+        goto error;
+    }
 
     do
     {
-		_printf(20, y_offset, "%s     = %05X / 40000", device, offset);
+        _printf(20, y_offset, "%s     = %05X / 40000", device, offset);
 
         //! set flash erased byte to buffer
         FS_MEMSET(io_buffer_spare, 0xff, IO_BUFFER_SPARE_SIZE);
-		io_buffer_spare_status = 0;
-		io_buffer_spare_pos = 0;
+        io_buffer_spare_status = 0;
+        io_buffer_spare_pos = 0;
         //readResult = readSlc(io_buffer, offset, (sizeof(io_buffer) / SLC_BYTES_PER_SECTOR), deviceHandle);
         readResult = srcRead(deviceHandle, io_buffer, offset, readSize, result_array);
 
-		if (readResult || io_buffer_spare_status || io_buffer_spare_pos != IO_BUFFER_SPARE_SIZE) {
-			
-			_printf(20, y_offset+10, "Failed to read flash block. read result: 0x%08X spare status: 0x%08X spare pos: 0x%08X", readResult, io_buffer_spare_status, io_buffer_spare_pos);
-			goto error;
-		}
-		//FS_SLEEP(10);
-		writeResult = fl_fwrite(io_buffer_spare, 1, readSize * SLC_BYTES_PER_SECTOR, file);
-		if (writeResult != readSize * SLC_BYTES_PER_SECTOR) {
-			_printf(20, y_offset + 10, "%s: Failed to write %d bytes to file %s (result: %d)!", device, readSize * SLC_BYTES_PER_SECTOR, file, filename, writeResult);
-			goto error;
-		}
-		offset += readSize;
+        if (readResult || io_buffer_spare_status || io_buffer_spare_pos != IO_BUFFER_SPARE_SIZE) {
+            
+            _printf(20, y_offset+10, "Failed to read flash block. read result: 0x%08X spare status: 0x%08X spare pos: 0x%08X", readResult, io_buffer_spare_status, io_buffer_spare_pos);
+            goto error;
+        }
+        //FS_SLEEP(10);
+        writeResult = fl_fwrite(io_buffer_spare, 1, readSize * SLC_BYTES_PER_SECTOR, file);
+        if (writeResult != readSize * SLC_BYTES_PER_SECTOR) {
+            _printf(20, y_offset + 10, "%s: Failed to write %d bytes to file %s (result: %d)!", device, readSize * SLC_BYTES_PER_SECTOR, file, filename, writeResult);
+            goto error;
+        }
+        offset += readSize;
     }
     while (offset < SLC_SECTOR_COUNT);
 
-	result = 0;
+    result = 0;
 
 error:
     FS_SVC_DESTROYMUTEX(sync_mutex);
 
-	if (file) {
-		fl_fclose(file);
-	}
+    if (file) {
+        fl_fclose(file);
+    }
     // last print to show "done"
     _printf(20, y_offset, "%s     = %05X / 40000", device, offset);
-	return result;
+    return result;
 }
 
 int mlc_dump(u32 mlc_end, int y_offset)
 {
     u32 offset = 0;
 
-	int result = -1;
+    int result = -1;
     int retry = 0;
     int mlc_result = 0;
     int callback_result = 0;
     int write_result = 0;
     int print_counter = 0;
-	int current_file_index = 0;
+    int current_file_index = 0;
 
 
-	char filename[40];
+    char filename[40];
     FL_FILE *file = NULL;
-	
+    
     do
     {
-		if (!file) {
-			FS_SNPRINTF(filename, sizeof(filename), "/mlc.bin.part%02d", ++current_file_index);
-			file = fl_fopen(filename, "w");
-			if (!file) {
-				_printf(20, y_offset, "Failed to open %s for writing", filename);
-				goto error;
-			}
-		}
+        if (!file) {
+            FS_SNPRINTF(filename, sizeof(filename), "/mlc.bin.part%02d", ++current_file_index);
+            file = fl_fopen(filename, "w");
+            if (!file) {
+                _printf(20, y_offset, "Failed to open %s for writing", filename);
+                goto error;
+            }
+        }
         //! print only every 4th time
         if(print_counter == 0)
         {
@@ -158,30 +158,30 @@ int mlc_dump(u32 mlc_end, int y_offset)
         }
         else
         {
-			write_result = fl_fwrite(io_buffer, 1, IO_BUFFER_SIZE, file);
-			if (write_result != IO_BUFFER_SIZE) {
-				_printf(20, y_offset + 10, "mlc: Failed to write %d bytes to file %s (result: %d)!", IO_BUFFER_SIZE, file, filename, write_result);
-				goto error;
-			}
-			offset += (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR);
-			if ((offset % 0x400000) == 0) {
-				fl_fclose(file);
-				file = NULL;
-			}
+            write_result = fl_fwrite(io_buffer, 1, IO_BUFFER_SIZE, file);
+            if (write_result != IO_BUFFER_SIZE) {
+                _printf(20, y_offset + 10, "mlc: Failed to write %d bytes to file %s (result: %d)!", IO_BUFFER_SIZE, file, filename, write_result);
+                goto error;
+            }
+            offset += (IO_BUFFER_SIZE / MLC_BYTES_PER_SECTOR);
+            if ((offset % 0x400000) == 0) {
+                fl_fclose(file);
+                file = NULL;
+            }
         }
     }
     while(offset < mlc_end); //! TODO: make define MLC32_SECTOR_COUNT:
 
-	result = 0;
+    result = 0;
 
 error:
-	if (file) {
-		fl_fclose(file);
-	}
+    if (file) {
+        fl_fclose(file);
+    }
     // last print to show "done"
     _printf(20, y_offset, "mlc         = %08X / %08X, mlc res %08X, retry %d", offset, mlc_end, mlc_result, retry);
 
-	return result;
+    return result;
 }
 
 int check_nand_type(void)
@@ -227,31 +227,31 @@ int check_nand_type(void)
 
 void dump_nand_complete()
 {
-	int offset_y = 30;
+    int offset_y = 30;
     _printf(20, offset_y, "Init SD card....");
-	if ( InitSDCardFAT32() != 0 ) {
+    if ( InitSDCardFAT32() != 0 ) {
         FS_SLEEP(3000);
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
-	}
+    }
     _printf(20, offset_y, "Init SD card.... Success!");
-	offset_y += 10;
+    offset_y += 10;
 
     //wait_format_confirmation();
 
-	u32 mlc_sector_count = 0;
-	if (dumper_config.dump_mlc) {
-		mlc_init();
-		FS_SLEEP(1000);
+    u32 mlc_sector_count = 0;
+    if (dumper_config.dump_mlc) {
+        mlc_init();
+        FS_SLEEP(1000);
 
-		int nand_type = check_nand_type();
-		//u32 sdio_sector_count = FS_MMC_SDCARD_STRUCT[0x30/4];
-		mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
-		//u32 fat32_partition_offset = (MLC_BASE_SECTORS + mlc_sector_count);
+        int nand_type = check_nand_type();
+        //u32 sdio_sector_count = FS_MMC_SDCARD_STRUCT[0x30/4];
+        mlc_sector_count = FS_MMC_MLC_STRUCT[0x30/4];
+        //u32 fat32_partition_offset = (MLC_BASE_SECTORS + mlc_sector_count);
 
-		_printf(20, offset_y, "Detected %d GB MLC NAND type.", (nand_type == MLC_NAND_TYPE_8GB) ? 8 : 32);
-		offset_y += 10;
-	}
-	offset_y += 10;
+        _printf(20, offset_y, "Detected %d GB MLC NAND type.", (nand_type == MLC_NAND_TYPE_8GB) ? 8 : 32);
+        offset_y += 10;
+    }
+    offset_y += 10;
 
     /*if(sdio_sector_count < fat32_partition_offset)
     {
@@ -266,58 +266,58 @@ void dump_nand_complete()
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
     }*/
 
-	if (dumper_config.dump_otp) {
-		_printf(20, offset_y, "Writing otp...");
-		FL_FILE *file = fl_fopen("/otp.bin", "w");
-		if (!file) {
-			_printf(20, offset_y+10, "Failed to open /otp.bin for writing!");
-			goto error;
-		}
-		// It doesn't work if we try write directly this buffer, does it try to access too much?
-		memcpy(io_buffer, dumper_config.otp_buffer, sizeof(dumper_config.otp_buffer));
-		if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.otp_buffer), file) != sizeof(dumper_config.otp_buffer)) {
-			fl_fclose(file);
-			_printf(20, offset_y+10, "Failed to write otp to file!");
-			goto error;			
-		}
-		fl_fclose(file);
-		_printf(20, offset_y, "Writing otp... Success!");
-		offset_y += 10;
-	}
-	if (dumper_config.dump_seeprom) {
-		_printf(20, offset_y, "Writing seeprom...");
-		FL_FILE *file = fl_fopen("/seeprom.bin", "w");
-		if (!file) {
-			_printf(20, offset_y+10, "Failed to open /seeprom.bin for writing!");
-			goto error;
-		}
-		// It doesn't work if we try write directly this buffer, does it try to access too much?
-		memcpy(io_buffer, dumper_config.seeprom_buffer, sizeof(dumper_config.seeprom_buffer));
-		if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.seeprom_buffer), file) != sizeof(dumper_config.seeprom_buffer)) {
-			fl_fclose(file);
-			_printf(20, offset_y+10, "Failed to write seeprom to file!");
-			goto error;			
-		}
-		fl_fclose(file);
-		_printf(20, offset_y, "Writing seeprom... Success!");
-		offset_y += 10;
-	}
-	if (dumper_config.dump_slc) {
-		if (slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", "/slc.bin", offset_y))
-			goto error;
-		offset_y += 10;
-	}
-	if (dumper_config.dump_slccmpt) {
-		if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", offset_y))
-			goto error;
-		offset_y += 10;
-	}
-	if (dumper_config.dump_mlc) {
-		if (mlc_dump(mlc_sector_count, offset_y))
-			goto error;
-		offset_y += 10;
-	}
-	offset_y += 20;
+    if (dumper_config.dump_otp) {
+        _printf(20, offset_y, "Writing otp...");
+        FL_FILE *file = fl_fopen("/otp.bin", "w");
+        if (!file) {
+            _printf(20, offset_y+10, "Failed to open /otp.bin for writing!");
+            goto error;
+        }
+        // It doesn't work if we try write directly this buffer, does it try to access too much?
+        memcpy(io_buffer, dumper_config.otp_buffer, sizeof(dumper_config.otp_buffer));
+        if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.otp_buffer), file) != sizeof(dumper_config.otp_buffer)) {
+            fl_fclose(file);
+            _printf(20, offset_y+10, "Failed to write otp to file!");
+            goto error;            
+        }
+        fl_fclose(file);
+        _printf(20, offset_y, "Writing otp... Success!");
+        offset_y += 10;
+    }
+    if (dumper_config.dump_seeprom) {
+        _printf(20, offset_y, "Writing seeprom...");
+        FL_FILE *file = fl_fopen("/seeprom.bin", "w");
+        if (!file) {
+            _printf(20, offset_y+10, "Failed to open /seeprom.bin for writing!");
+            goto error;
+        }
+        // It doesn't work if we try write directly this buffer, does it try to access too much?
+        memcpy(io_buffer, dumper_config.seeprom_buffer, sizeof(dumper_config.seeprom_buffer));
+        if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.seeprom_buffer), file) != sizeof(dumper_config.seeprom_buffer)) {
+            fl_fclose(file);
+            _printf(20, offset_y+10, "Failed to write seeprom to file!");
+            goto error;            
+        }
+        fl_fclose(file);
+        _printf(20, offset_y, "Writing seeprom... Success!");
+        offset_y += 10;
+    }
+    if (dumper_config.dump_slc) {
+        if (slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", "/slc.bin", offset_y))
+            goto error;
+        offset_y += 10;
+    }
+    if (dumper_config.dump_slccmpt) {
+        if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", offset_y))
+            goto error;
+        offset_y += 10;
+    }
+    if (dumper_config.dump_mlc) {
+        if (mlc_dump(mlc_sector_count, offset_y))
+            goto error;
+        offset_y += 10;
+    }
+    offset_y += 20;
 
     _printf(20, offset_y, "Complete! -> rebooting into sysNAND...");
 
@@ -325,7 +325,7 @@ void dump_nand_complete()
     svcShutdown(SHUTDOWN_TYPE_REBOOT);
 
 error:
-	offset_y += 20;
+    offset_y += 20;
     _printf(20, offset_y, "Error! -> rebooting into sysNAND...");
 
     FS_SLEEP(3000);

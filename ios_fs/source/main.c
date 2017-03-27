@@ -25,10 +25,10 @@ void createDevThread_entry(int initialization_type)
     {
         //if(check_nand_dump() == 0)
         //{
-		clearScreen(0x000000FF);
-		_printf(20, 20, "welcome to NAND dumper!");
+        clearScreen(0x000000FF);
+        _printf(20, 20, "welcome to NAND dumper!");
 
-		dump_nand_complete();
+        dump_nand_complete();
         //}
     }
 }

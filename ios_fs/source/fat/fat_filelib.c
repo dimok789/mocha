@@ -630,12 +630,12 @@ static uint32 _read_sectors(FL_FILE* file, uint32 offset, uint8 *buffer, uint32 
 void fl_init(void)
 {
     int i;
-	memset(_files, 0, sizeof(_files));
-	memset(&_filelib_init, 0, sizeof(_filelib_init));
-	memset(&_filelib_valid, 0, sizeof(_filelib_valid));
-	memset(&_fs, 0, sizeof(_fs));
-	memset(&_open_file_list, 0, sizeof(_open_file_list));
-	memset(&_free_file_list, 0, sizeof(_free_file_list));
+    memset(_files, 0, sizeof(_files));
+    memset(&_filelib_init, 0, sizeof(_filelib_init));
+    memset(&_filelib_valid, 0, sizeof(_filelib_valid));
+    memset(&_fs, 0, sizeof(_fs));
+    memset(&_open_file_list, 0, sizeof(_open_file_list));
+    memset(&_free_file_list, 0, sizeof(_free_file_list));
 
     fat_list_init(&_free_file_list);
     fat_list_init(&_open_file_list);

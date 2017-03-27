@@ -154,14 +154,14 @@ int slcWrite2_patch(void *physical_device_info, u32 offset_high, u32 offset_low,
 
 int eccCheck_patch(void *buffer, char* spare_ecc, char* calculated_ecc, int ecc_length)
 {
-	if (io_buffer_spare_status || io_buffer_spare_pos > sizeof(io_buffer_spare) || io_buffer_spare_pos+0x840 > sizeof(io_buffer_spare)) {
-		io_buffer_spare_status = -1;
-		return 0;
-	}
-	memcpy(io_buffer_spare+io_buffer_spare_pos, buffer, 0x800);
-	io_buffer_spare_pos += 0x800;
-	memcpy(io_buffer_spare+io_buffer_spare_pos, spare_ecc - 0x30, 0x40);
-	io_buffer_spare_pos += 0x40;
+    if (io_buffer_spare_status || io_buffer_spare_pos > sizeof(io_buffer_spare) || io_buffer_spare_pos+0x840 > sizeof(io_buffer_spare)) {
+        io_buffer_spare_status = -1;
+        return 0;
+    }
+    memcpy(io_buffer_spare+io_buffer_spare_pos, buffer, 0x800);
+    io_buffer_spare_pos += 0x800;
+    memcpy(io_buffer_spare+io_buffer_spare_pos, spare_ecc - 0x30, 0x40);
+    io_buffer_spare_pos += 0x40;
     return 0;
 }
 

@@ -25,9 +25,9 @@ static int exitToHBLOnLaunch = 0;
 
 int Menu_Main(void)
 {
-	//!---------INIT---------
-	InitOSFunctionPointers();
-	InitSysFunctionPointers();
+    //!---------INIT---------
+    InitOSFunctionPointers();
+    InitSysFunctionPointers();
     InitFSFunctionPointers();
     InitSocketFunctionPointers();
     InitVPadFunctionPointers();
@@ -83,9 +83,9 @@ int Menu_Main(void)
         {
             //if(config.noIosReload == 0)
             //{
-			OSForceFullRelaunch();
-			SYSLaunchMenu();
-			returnCode = EXIT_RELAUNCH_ON_LOAD;
+            OSForceFullRelaunch();
+            SYSLaunchMenu();
+            returnCode = EXIT_RELAUNCH_ON_LOAD;
             //}
             //else if(config.launchSysMenu)
             //{
