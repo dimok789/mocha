@@ -8,6 +8,9 @@ SECTIONS
 		*(.rodata*);
 	}
 	_text_end = .;
+	.dumper_config : {
+		*(.dumper_config*);
+	}
 
 	.bss (0x10835000 + 0x1406554) : {
 		_bss_start = .;

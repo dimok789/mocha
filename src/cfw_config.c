@@ -88,6 +88,8 @@ void default_config(cfw_config_t * config)
     config->dumpSlc = 1;
     config->dumpSlccmpt = 1;
     config->dumpMlc = 0;
+    config->dumpOtp = 1;
+    config->dumpSeeprom = 1;
 }
 
 /*int read_config(cfw_config_t * config)

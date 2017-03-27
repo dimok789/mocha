@@ -38,7 +38,7 @@ extern void __KERNEL_CODE_END(void);
 extern const patch_table_t kernel_patches_table[];
 extern const patch_table_t kernel_patches_table_end[];
 
-static u8 otp_buffer[0x400];
+//static u8 otp_buffer[0x400];
 
 static const u32 mcpIoMappings_patch[] =
 {
@@ -60,7 +60,7 @@ static u32 kernel_syscall_0x81(u32 address)
     return *(volatile u32*)address;
 }
 
-static int kernel_read_otp_internal(int index, void* out_buf, u32 size)
+/*static int kernel_read_otp_internal(int index, void* out_buf, u32 size)
 {
     kernel_memcpy(out_buf, otp_buffer + (index << 2), size);
     return 0;
@@ -85,7 +85,7 @@ int kernel_init_otp_buffer(u32 sd_sector, int dumpFound)
         FSA_SDWriteRawSectors(otp_buffer, sd_sector, 2);
     }
     return res;
-}
+}*/
 
 void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
 {

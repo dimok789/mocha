@@ -59,6 +59,7 @@ $(PROJECTNAME)_syms.h:
 	@echo "#define $(PROJECTNAME)_SYMS_H" >> $@
 	@$(OBJDUMP) -EB -t -marm $(PROJECTNAME).elf | grep 'g     F .text' | grep -v '.hidden' | awk '{print "#define " $$6 " 0x" $$1}' >> $@
 	@$(OBJDUMP) -EB -t -marm $(PROJECTNAME).elf | grep -e 'g       .text' -e '_bss_' | awk '{print "#define " $$5 " 0x" $$1}' >> $@
+	@$(OBJDUMP) -EB -t -marm $(PROJECTNAME).elf | grep -e 'g     O .dumper_config'  | awk '{print "#define " $$6 " 0x" $$1}' >> $@
 	@echo "#endif" >> $@
 
 clean:

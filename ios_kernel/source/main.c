@@ -34,6 +34,9 @@
 
 cfw_config_t cfw_config;
 
+unsigned char otp_buffer[0x400];
+unsigned char seeprom_buffer[0x400];
+
 typedef struct
 {
     u32 size;
@@ -64,15 +67,104 @@ static const char repairData_usb_root_thread[] = {
 	0xE5,0x9F,0x0E,0x68,0xEB,0x00,0xB3,0x20,
 };
 
+// based on mini implementation by sven peter
+#define	LT_TIMER            0x0d800010
+#define LT_GPIO_OUT         0x0d8000e0
+#define LT_GPIO_IN          0x0d8000e8
+
+#define EEPROM_SPI_CS       0x400
+#define EEPROM_SPI_SCK      0x800
+#define EEPROM_SPI_MOSI     0x1000
+#define EEPROM_SPI_MISO     0x2000
+
+#define HW_REG(reg)         (*(volatile unsigned int*)(reg))
+
+static inline void _delay(u32 ticks)
+{
+	u32 now = HW_REG(LT_TIMER);
+	while((HW_REG(LT_TIMER) - now) < ticks);
+}
+
+static u32 spi_read(int bit_count)
+{
+	u32 word = 0;
+	while(bit_count--)
+	{
+		word <<= 1;
+
+		HW_REG(LT_GPIO_OUT) |= EEPROM_SPI_SCK;
+		_delay(9);
+
+		HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_SCK;
+		_delay(9);
+
+		word |= ((HW_REG(LT_GPIO_IN) & EEPROM_SPI_MISO) != 0);
+	}
+	return word;
+}
+
+static void spi_write(u32 word, int bit_count)
+{
+	while(bit_count--)
+	{
+		if(word & (1 << bit_count))
+        {
+			HW_REG(LT_GPIO_OUT) |= EEPROM_SPI_MOSI;
+        }
+		else
+        {
+			HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_MOSI;
+        }
+		_delay(9);
+
+		HW_REG(LT_GPIO_OUT) |= EEPROM_SPI_SCK;
+		_delay(9);
+
+		HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_SCK;
+		_delay(9);
+	}
+}
+
+static int seeprom_read(u16 *dst, int offset, int size)
+{
+	int i;
+    offset >>= 1;
+    size >>= 1;
+
+    HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_SCK;
+    HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_CS;
+	_delay(9);
+
+	for(i = 0; i < size; ++i, ++offset)
+	{
+		HW_REG(LT_GPIO_OUT) |= EEPROM_SPI_CS;
+		spi_write((0x600 | offset), 11);
+
+		dst[i] = spi_read(16);
+
+		HW_REG(LT_GPIO_OUT) &= ~EEPROM_SPI_CS;
+		_delay(9);
+	}
+
+	return size;
+}
+
 int _main()
 {
 	void(*invalidate_icache)() = (void(*)())0x0812DCF0;
 	void(*invalidate_dcache)(unsigned int, unsigned int) = (void(*)())0x08120164;
 	void(*flush_dcache)(unsigned int, unsigned int) = (void(*)())0x08120160;
+    int (*orig_kernel_read_otp_internal)(int index, void* out_buf, u32 size) = (void*)0x08120248;
 
-	flush_dcache(0x081200F0, 0x4001); // giving a size >= 0x4000 flushes all cache
+	// We don't have the config yet, so read it anyway
+	orig_kernel_read_otp_internal(0, otp_buffer, 0x400);
+
+    flush_dcache(0x081200F0, 0x4001); // giving a size >= 0x4000 flushes all cache
 
 	int level = disable_interrupts();
+
+	// We don't have the config yet, so read it anyway
+	seeprom_read(seeprom_buffer, 0, 0x200);
 
 	unsigned int control_register = disable_mmu();
 

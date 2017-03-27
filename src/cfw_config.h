@@ -42,6 +42,8 @@ typedef struct
     int dumpSlc;
     int dumpSlccmpt;
     int dumpMlc;
+    int dumpOtp;
+    int dumpSeeprom;
 } cfw_config_t;
 
 void default_config(cfw_config_t * config);

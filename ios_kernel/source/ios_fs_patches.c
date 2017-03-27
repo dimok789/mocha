@@ -25,7 +25,9 @@
 #include "elf_patcher.h"
 #include "ios_fs_patches.h"
 #include "config.h"
+#include "utils.h"
 #include "../../ios_fs/ios_fs_syms.h"
+#include "../../ios_fs/source/fs_config.h"
 
 #define FS_PHYS_DIFF                                0
 
@@ -51,6 +53,9 @@
 extern const patch_table_t fs_patches_table[];
 extern const patch_table_t fs_patches_table_end[];
 
+extern unsigned char otp_buffer[0x400];
+extern unsigned char seeprom_buffer[0x400];
+
 u32 fs_get_phys_code_base(void)
 {
     return _text_start + FS_PHYS_DIFF;
@@ -58,6 +63,8 @@ u32 fs_get_phys_code_base(void)
 
 void fs_run_patches(u32 ios_elf_start)
 {
+	fs_config config;
+
     // write wupserver code and bss
     section_write(ios_elf_start, _text_start, (void*)fs_get_phys_code_base(), _text_end - _text_start);
     section_write_bss(ios_elf_start, _bss_start, _bss_end - _bss_start);
@@ -78,9 +85,16 @@ void fs_run_patches(u32 ios_elf_start)
 
     section_write_word(ios_elf_start, FS_SLC_ECC_CHECK, ARM_B(FS_SLC_ECC_CHECK, eccCheck_patch));
 
-    section_write_word(ios_elf_start, (_text_start - 4), cfw_config.dumpSlc);
-    section_write_word(ios_elf_start, (_text_start - 8), cfw_config.dumpSlccmpt);
-    section_write_word(ios_elf_start, (_text_start - 12), cfw_config.dumpMlc);
+	config.dump_slc = cfw_config.dumpSlc;
+	config.dump_slccmpt = cfw_config.dumpSlccmpt;
+	config.dump_mlc = cfw_config.dumpMlc;
+	config.dump_otp = cfw_config.dumpOtp;
+	config.dump_seeprom = cfw_config.dumpSeeprom;
+	if (cfw_config.dumpOtp)
+		kernel_memcpy(config.otp_buffer, otp_buffer, sizeof(config.otp_buffer));
+	if (cfw_config.dumpSeeprom)
+		kernel_memcpy(config.seeprom_buffer, seeprom_buffer, sizeof(config.seeprom_buffer));
+    section_write(ios_elf_start, dumper_config, &config, sizeof(config));
 
     //section_write_word(ios_elf_start, FS_USB_READ, ARM_B(FS_USB_READ, usbRead_patch));
     //section_write_word(ios_elf_start, FS_USB_WRITE, ARM_B(FS_USB_WRITE, usbWrite_patch));

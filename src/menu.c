@@ -36,7 +36,7 @@
 #include "dynamic_libs/socket_functions.h"
 #include "cfw_config.h"
 
-#define MAX_CONFIG_SETTINGS 3
+#define MAX_CONFIG_SETTINGS 5
 //#define MAX_CONFIG_SETTINGS_EXPERT          9
 //#define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
 
@@ -162,6 +162,12 @@ int ShowMenu(cfw_config_t * currentConfig)
                     break;
                 case 2:
                     config.dumpMlc = !config.dumpMlc;
+                    break;
+                case 3:
+                    config.dumpOtp = !config.dumpOtp;
+                    break;
+                case 4:
+                    config.dumpSeeprom = !config.dumpSeeprom;
                     break;
                 /*case 0:
                     config.viewMode = !config.viewMode;

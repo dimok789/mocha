@@ -8,6 +8,9 @@
 #include "text.h"
 #include "hardware_registers.h"
 #include "svc.h"
+#include "fs_config.h"
+
+fs_config dumper_config __attribute__((section(".dumper_config")));
 
 #define IO_BUFFER_SIZE 0x40000
 #define IO_BUFFER_SPARE_SIZE (IO_BUFFER_SIZE+0x2000)
@@ -233,15 +236,10 @@ void dump_nand_complete()
     _printf(20, offset_y, "Init SD card.... Success!");
 	offset_y += 10;
 
-	int * dumpSlc =  (int *)(0x107f8200 - 4);
-	int * dumpSlccmpt =  (int *)(0x107f8200 - 8);
-	int * dumpMlc =  (int *)(0x107f8200 - 12);
-
-
     //wait_format_confirmation();
 
 	u32 mlc_sector_count = 0;
-	if (*dumpMlc) {
+	if (dumper_config.dump_mlc) {
 		mlc_init();
 		FS_SLEEP(1000);
 
@@ -268,17 +266,53 @@ void dump_nand_complete()
         svcShutdown(SHUTDOWN_TYPE_REBOOT);
     }*/
 
-	if (*dumpSlc) {
+	if (dumper_config.dump_otp) {
+		_printf(20, offset_y, "Writing otp...");
+		FL_FILE *file = fl_fopen("/otp.bin", "w");
+		if (!file) {
+			_printf(20, offset_y+10, "Failed to open /otp.bin for writing!");
+			goto error;
+		}
+		// It doesn't work if we try write directly this buffer, does it try to access too much?
+		memcpy(io_buffer, dumper_config.otp_buffer, sizeof(dumper_config.otp_buffer));
+		if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.otp_buffer), file) != sizeof(dumper_config.otp_buffer)) {
+			fl_fclose(file);
+			_printf(20, offset_y+10, "Failed to write otp to file!");
+			goto error;			
+		}
+		fl_fclose(file);
+		_printf(20, offset_y, "Writing otp... Success!");
+		offset_y += 10;
+	}
+	if (dumper_config.dump_seeprom) {
+		_printf(20, offset_y, "Writing seeprom...");
+		FL_FILE *file = fl_fopen("/seeprom.bin", "w");
+		if (!file) {
+			_printf(20, offset_y+10, "Failed to open /seeprom.bin for writing!");
+			goto error;
+		}
+		// It doesn't work if we try write directly this buffer, does it try to access too much?
+		memcpy(io_buffer, dumper_config.seeprom_buffer, sizeof(dumper_config.seeprom_buffer));
+		if (fl_fwrite(io_buffer, 1, sizeof(dumper_config.seeprom_buffer), file) != sizeof(dumper_config.seeprom_buffer)) {
+			fl_fclose(file);
+			_printf(20, offset_y+10, "Failed to write seeprom to file!");
+			goto error;			
+		}
+		fl_fclose(file);
+		_printf(20, offset_y, "Writing seeprom... Success!");
+		offset_y += 10;
+	}
+	if (dumper_config.dump_slc) {
 		if (slc_dump(FS_SLC_PHYS_DEV_STRUCT,     "slc    ", "/slc.bin", offset_y))
 			goto error;
 		offset_y += 10;
 	}
-	if (*dumpSlccmpt) {
+	if (dumper_config.dump_slccmpt) {
 		if (slc_dump(FS_SLCCMPT_PHYS_DEV_STRUCT, "slccmpt", "/slccmpt.bin", offset_y))
 			goto error;
 		offset_y += 10;
 	}
-	if (*dumpMlc) {
+	if (dumper_config.dump_mlc) {
 		if (mlc_dump(mlc_sector_count, offset_y))
 			goto error;
 		offset_y += 10;
