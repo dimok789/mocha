@@ -319,14 +319,14 @@ void dump_nand_complete()
     }
     offset_y += 20;
 
-    _printf(20, offset_y, "Complete! -> rebooting into sysNAND...");
+    _printf(20, offset_y, "Complete! -> rebooting...");
 
     FS_SLEEP(3000);
     svcShutdown(SHUTDOWN_TYPE_REBOOT);
 
 error:
     offset_y += 20;
-    _printf(20, offset_y, "Error! -> rebooting into sysNAND...");
+    _printf(20, offset_y, "Error! -> rebooting...");
 
     FS_SLEEP(3000);
     svcShutdown(SHUTDOWN_TYPE_REBOOT);
