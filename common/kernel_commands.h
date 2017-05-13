@@ -21,11 +21,12 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef KERNEL_COMMANDS_H_
+#define KERNEL_COMMANDS_H_
 
-#include "../../common/config_types.h"
-
-extern cfw_config_t cfw_config;
+#define KERNEL_READ32           1
+#define KERNEL_WRITE32          2
+#define KERNEL_MEMCPY           3
+#define KERNEL_GET_CFW_CONFIG   4
 
 #endif

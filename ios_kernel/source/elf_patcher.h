@@ -26,8 +26,10 @@
 
 #include "types.h"
 
-#define ARM_B(addr, func)   (0xEA000000 | ((((u32)(func) - (u32)(addr) - 8) >> 2) & 0x00FFFFFF))
-#define ARM_BL(addr, func)  (0xEB000000 | ((((u32)(func) - (u32)(addr) - 8) >> 2) & 0x00FFFFFF))
+#define ARM_B(addr, func)       (0xEA000000 | ((((u32)(func) - (u32)(addr) - 8) >> 2) & 0x00FFFFFF))                                                        // +-32MB
+#define ARM_BL(addr, func)      (0xEB000000 | ((((u32)(func) - (u32)(addr) - 8) >> 2) & 0x00FFFFFF))                                                        // +-32MB
+#define THUMB_B(addr, func)     ((0xE000 | ((((u32)(func) - (u32)(addr) - 4) >> 1) & 0x7FF)))                                                               // +-2KB
+#define THUMB_BL(addr, func)    ((0xF000F800 | ((((u32)(func) - (u32)(addr) - 4) >> 1) & 0x0FFF)) | ((((u32)(func) - (u32)(addr) - 4) << 4) & 0x7FFF000))   // +-4MB
 
 typedef struct
 {

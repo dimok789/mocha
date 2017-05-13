@@ -21,11 +21,22 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef _FSA_H_
+#define _FSA_H_
 
-#include "../../common/config_types.h"
-
-extern cfw_config_t cfw_config;
+typedef struct
+{
+    u32 flag;
+    u32 permission;
+    u32 owner_id;
+    u32 group_id;
+    u32 size; // size in bytes
+    u32 physblock_size; // physical size on disk in bytes
+    u64 quota_size;
+    u32 id;
+    u32 ctime;
+    u32 mtime;
+    u32 unk2[0x0D];
+}fileStat_s;
 
 #endif

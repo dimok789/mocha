@@ -8,6 +8,7 @@
 #include "text.h"
 #include "hardware_registers.h"
 #include "svc.h"
+#include "../../common/kernel_commands.h"
 
 // the IO buffer is put behind everything else because there is no access to this region from IOS-FS it seems
 unsigned char io_buffer[0x40000]  __attribute__((aligned(0x40))) __attribute__((section(".io_buffer")));
@@ -206,7 +207,7 @@ static void wait_format_confirmation(void)
         _printf(20, 30, "No NAND dump detected. SD Format and complete NAND dump required.");
         _printf(20, 40, "Press the POWER button to format SD card otherwise the console will reboot in %d seconds.", timeout/10);
 
-        if(svcRead32(LT_GPIO_IN) & GPIO_IN_POWER_BUTTON)
+        if(svcCustomKernelCommand(KERNEL_READ32, LT_GPIO_IN) & GPIO_IN_POWER_BUTTON)
         {
             break;
         }

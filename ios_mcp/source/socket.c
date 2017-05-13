@@ -153,6 +153,20 @@ int listen(int sockfd, int backlog)
 	return ret;
 }
 
+int shutdown(int sockfd, int how)
+{
+	u8* iobuf = allocIobuf(0x8);
+	u32* inbuf = (u32*)iobuf;
+
+	inbuf[0] = sockfd;
+	inbuf[1] = how;
+
+	int ret = svcIoctl(socket_handle, 0x10, inbuf, 0x8, NULL, 0);
+
+	freeIobuf(iobuf);
+	return ret;
+}
+
 int recv(int sockfd, void *buf, size_t len, int flags)
 {
 	if(!len) return -101;

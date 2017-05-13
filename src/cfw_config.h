@@ -28,18 +28,7 @@
 #define APP_PATH            "sd:/wiiu/apps/mocha"
 #define CONFIG_PATH         (APP_PATH "/config.ini")
 
-typedef struct
-{
-    int viewMode;
-    int directLaunch;
-    int launchImage;
-    int noIosReload;
-    int launchSysMenu;
-    int redNAND;
-    int seeprom_red;
-    int otp_red;
-    int syshaxXml;
-} cfw_config_t;
+#include "../common/config_types.h"
 
 void default_config(cfw_config_t * config);
 int read_config(cfw_config_t * config);

@@ -325,7 +325,7 @@ class wupclient:
             #     print(data[:data.index(0)].decode("ascii"))
             #     break
             # else:
-            print(data.decode("ascii"))
+            print(data)
 
     # file management
     def get_fsa_handle(self):

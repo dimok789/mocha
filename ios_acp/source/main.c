@@ -21,11 +21,21 @@
  * 3. This notice may not be removed or altered from any source
  * distribution.
  ***************************************************************************/
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+ #include "types.h"
 
-#include "../../common/config_types.h"
+int ACP_FSARawRead_hook(int fd, void* data, u64 offset, u32 cnt, u32 blocksize, int device_handle)
+{
+    int (*ACP_FSARawRead)(int fd, void* data, u64 offset, u32 cnt, u32 blocksize, int device_handle) = (void*)0xE00BAF74;
 
-extern cfw_config_t cfw_config;
+    int res = ACP_FSARawRead(fd, data, offset, cnt, blocksize, device_handle);
 
-#endif
+    //! the PPC side has a way to check for a PC or WFS formatted drive by checking the MBR signature
+    //! it's the only place where this is used so we can just fake it with wrong values.
+    u8 *buf = (u8*)data;
+    if((offset == 0) && (buf[510] == 0x55) && (buf[511] == 0xAA))
+    {
+        buf[510] = 0xB3;
+        buf[511] = 0xDE;
+    }
+    return res;
+}

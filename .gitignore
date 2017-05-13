@@ -25,3 +25,8 @@
 /ios_usb/*.elf
 /ios_usb/ios_usb_syms.h
 /ios_usb/build
+/ios_acp/build
+/ios_acp/*.bin
+/ios_acp/ios_acp.bin.h
+/ios_acp/*.elf
+/ios_acp/ios_acp_syms.h

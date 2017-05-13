@@ -24,6 +24,7 @@
 #include "types.h"
 #include "elf_patcher.h"
 #include "ios_fs_patches.h"
+#include "config.h"
 #include "../../ios_fs/ios_fs_syms.h"
 
 #define FS_PHYS_DIFF                                0
@@ -63,22 +64,39 @@ void fs_run_patches(u32 ios_elf_start)
     // patch FS logging
     section_write_word(ios_elf_start, FS_PRINTF_SYSLOG, ARM_B(FS_PRINTF_SYSLOG, FS_SYSLOG_OUTPUT));
 
-    section_write_word(ios_elf_start, CALL_FS_REGISTERMDPHYSICALDEVICE, ARM_BL(CALL_FS_REGISTERMDPHYSICALDEVICE, registerMdDevice_hook));
-    section_write_word(ios_elf_start, FS_GETMDDEVICEBYID + 8, ARM_BL((FS_GETMDDEVICEBYID + 8), getMdDeviceById_hook));
+    if(cfw_config.redNAND)
+    {
+        section_write_word(ios_elf_start, CALL_FS_REGISTERMDPHYSICALDEVICE, ARM_BL(CALL_FS_REGISTERMDPHYSICALDEVICE, registerMdDevice_hook));
+        section_write_word(ios_elf_start, FS_GETMDDEVICEBYID + 8, ARM_BL((FS_GETMDDEVICEBYID + 8), getMdDeviceById_hook));
 
-    section_write_word(ios_elf_start, FS_SDCARD_READ1, ARM_B(FS_SDCARD_READ1, sdcardRead_patch));
-    section_write_word(ios_elf_start, FS_SDCARD_WRITE1, ARM_B(FS_SDCARD_WRITE1, sdcardWrite_patch));
+        section_write_word(ios_elf_start, FS_SDCARD_READ1, ARM_B(FS_SDCARD_READ1, sdcardRead_patch));
+        section_write_word(ios_elf_start, FS_SDCARD_WRITE1, ARM_B(FS_SDCARD_WRITE1, sdcardWrite_patch));
 
-    section_write_word(ios_elf_start, FS_SLC_READ1, ARM_B(FS_SLC_READ1, slcRead1_patch));
-    section_write_word(ios_elf_start, FS_SLC_READ2, ARM_B(FS_SLC_READ2, slcRead2_patch));
-    section_write_word(ios_elf_start, FS_SLC_WRITE1, ARM_B(FS_SLC_WRITE1, slcWrite1_patch));
-    section_write_word(ios_elf_start, FS_SLC_WRITE2, ARM_B(FS_SLC_WRITE2, slcWrite2_patch));
+        section_write_word(ios_elf_start, FS_SLC_READ1, ARM_B(FS_SLC_READ1, slcRead1_patch));
+        section_write_word(ios_elf_start, FS_SLC_READ2, ARM_B(FS_SLC_READ2, slcRead2_patch));
+        section_write_word(ios_elf_start, FS_SLC_WRITE1, ARM_B(FS_SLC_WRITE1, slcWrite1_patch));
+        section_write_word(ios_elf_start, FS_SLC_WRITE2, ARM_B(FS_SLC_WRITE2, slcWrite2_patch));
 
-    //section_write_word(ios_elf_start, FS_USB_READ, ARM_B(FS_USB_READ, usbRead_patch));
-    //section_write_word(ios_elf_start, FS_USB_WRITE, ARM_B(FS_USB_WRITE, usbWrite_patch));
+        //section_write_word(ios_elf_start, FS_USB_READ, ARM_B(FS_USB_READ, usbRead_patch));
+        //section_write_word(ios_elf_start, FS_USB_WRITE, ARM_B(FS_USB_WRITE, usbWrite_patch));
+    }
+
+    section_write_word(ios_elf_start, 0x1070F87C, ARM_BL(0x1070F87C, FSA_AttachVolume_FillDescription_hook));
+    section_write_word(ios_elf_start, 0x10700EFC, ARM_BL(0x10700EFC, FSA_AsyncCommandCallback_hook));
+    // patch mounting FAT and allow all devices instead of only SD card
+    section_write_word(ios_elf_start, 0x1078E074, 0xEA000002);
+    // patch FSA_MakeQuota to not store command -> command is modified depending on wether it is USB FAT or not
+    section_write_word(ios_elf_start, 0x1070BE0C, 0xE1A00000);
+    section_write_word(ios_elf_start, 0x1070BE00, ARM_BL(0x1070BE00, FSA_MakeQuota_asm_hook));
 
     section_write_word(ios_elf_start, FS_CREATEDEVTHREAD_HOOK, ARM_B(FS_CREATEDEVTHREAD_HOOK, createDevThread_hook));
 
     u32 patch_count = (u32)(((u8*)fs_patches_table_end) - ((u8*)fs_patches_table)) / sizeof(patch_table_t);
     patch_table_entries(ios_elf_start, fs_patches_table, patch_count);
+
+    //section_write_word(ios_elf_start, 0x10701F6C, ARM_BL(0x10701F6C, FSMakeQuota));
+    //section_write_word(ios_elf_start, 0x10702764, ARM_BL(0x10702764, FSCreateDir));
+    //section_write_word(ios_elf_start, 0x1070278C, ARM_BL(0x1070278C, FSChangeDir));
+    //section_write_word(ios_elf_start, 0x107024B4, ARM_BL(0x107024B4, FSOpenFile));
+    //section_write_word(ios_elf_start, 0x10703F4C, ARM_BL(0x10703F4C, FSWriteFileIssueCommand));
 }

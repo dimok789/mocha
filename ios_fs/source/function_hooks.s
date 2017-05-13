@@ -5,10 +5,11 @@
 .extern createDevThread_entry
     .globl createDevThread_hook
 createDevThread_hook:
-    push {r0,lr}
+    push {r0,r1,lr}
     ldr r0, [r4, #0x8]
+    mov r1, r7
     bl createDevThread_entry
-    pop {r0,lr}
+    pop {r0,r1,lr}
 #   restore original instruction
     pop {r4-r8,pc}
 
@@ -55,6 +56,14 @@ sdcardRead_original:
     ldr r4, [pc]
     bx r4
     .word 0x107BDDD4
+
+#############################################################################################
+# FSA functions
+#############################################################################################
+    .globl FSA_MakeQuota_asm_hook
+FSA_MakeQuota_asm_hook:
+    mov r1, r5
+    b FSA_MakeQuota_hook
 
 #############################################################################################
 # DEBUG STUFF

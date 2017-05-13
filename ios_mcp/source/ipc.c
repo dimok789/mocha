@@ -30,6 +30,8 @@
 #include "text.h"
 #include "logger.h"
 #include "fsa.h"
+#include "wupserver.h"
+#include "../../common/kernel_commands.h"
 
 #define IOS_ERROR_UNKNOWN_VALUE     0xFFFFFFD6
 #define IOS_ERROR_INVALID_ARG       0xFFFFFFE3
@@ -40,6 +42,7 @@
 #define IOCTL_MEM_WRITE             0x00
 #define IOCTL_MEM_READ              0x01
 #define IOCTL_SVC                   0x02
+#define IOCTL_KILL_SERVER           0x03
 #define IOCTL_MEMCPY                0x04
 #define IOCTL_REPEATED_WRITE        0x05
 #define IOCTL_KERN_READ32           0x06
@@ -71,6 +74,7 @@
 #define IOCTL_FSA_RAW_CLOSE         0x57
 #define IOCTL_FSA_CHANGEMODE        0x58
 
+static int ipcNodeKilled;
 static u8 threadStack[0x1000] __attribute__((aligned(0x20)));
 
 static int ipc_ioctl(ipcmessage *message)
@@ -121,6 +125,12 @@ static int ipc_ioctl(ipcmessage *message)
             // return error code as data
             message->ioctl.buffer_io[0] = ((int (*const)(u32, u32, u32, u32, u32, u32, u32, u32))(MCP_SVC_BASE + svc_id * 8))(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7]);
         }
+        break;
+    }
+    case IOCTL_KILL_SERVER:
+    {
+        ipcNodeKilled = 1;
+        wupserver_deinit();
         break;
     }
     case IOCTL_MEMCPY:
@@ -180,7 +190,7 @@ static int ipc_ioctl(ipcmessage *message)
         {
             for(u32 i = 0; i < (message->ioctl.length_io/4); i++)
             {
-                message->ioctl.buffer_io[i] = svcRead32(message->ioctl.buffer_in[0] + i * 4);
+                message->ioctl.buffer_io[i] = svcCustomKernelCommand(KERNEL_READ32, message->ioctl.buffer_in[0] + i * 4);
             }
         }
         break;
@@ -420,61 +430,76 @@ static int ipc_thread(void *arg)
 
     int queueId = svcCreateMessageQueue(messageQueue, sizeof(messageQueue) / 4);
 
-    if(svcRegisterResourceManager("/dev/iosuhax", queueId) != 0)
+    if(svcRegisterResourceManager("/dev/iosuhax", queueId) == 0)
     {
-        return 0;
+        while(!ipcNodeKilled)
+        {
+            res = svcReceiveMessage(queueId, &message, 0);
+            if(res < 0)
+            {
+                usleep(10000);
+                continue;
+            }
+
+            switch(message->command)
+            {
+                case IOS_OPEN:
+                {
+                    log_printf("IOS_OPEN\n");
+                    res = 0;
+                    break;
+                }
+                case IOS_CLOSE:
+                {
+                    log_printf("IOS_CLOSE\n");
+                    res = 0;
+                    break;
+                }
+                case IOS_IOCTL:
+                {
+                    log_printf("IOS_IOCTL\n");
+                    res = ipc_ioctl(message);
+                    break;
+                }
+                case IOS_IOCTLV:
+                {
+                    log_printf("IOS_IOCTLV\n");
+                    res = 0;
+                    break;
+                }
+                default:
+                {
+                    log_printf("unexpected command 0x%X\n", message->command);
+                    res = IOS_ERROR_UNKNOWN_VALUE;
+                    break;
+                }
+            }
+
+            svcResourceReply(message, res);
+        }
     }
 
-	while(1)
-	{
-        res = svcReceiveMessage(queueId, &message, 0);
-        if(res < 0)
-        {
-            usleep(10000);
-            continue;
-        }
-
-        switch(message->command)
-        {
-            case IOS_OPEN:
-            {
-                log_printf("IOS_OPEN\n");
-                res = 0;
-                break;
-            }
-            case IOS_CLOSE:
-            {
-                log_printf("IOS_CLOSE\n");
-                res = 0;
-                break;
-            }
-            case IOS_IOCTL:
-            {
-                log_printf("IOS_IOCTL\n");
-                res = ipc_ioctl(message);
-                break;
-            }
-            case IOS_IOCTLV:
-            {
-                log_printf("IOS_IOCTLV\n");
-                res = 0;
-                break;
-            }
-            default:
-            {
-                log_printf("unexpected command 0x%X\n", message->command);
-                res = IOS_ERROR_UNKNOWN_VALUE;
-                break;
-            }
-        }
-
-        svcResourceReply(message, res);
-	}
+	svcDestroyMessageQueue(queueId);
+	return 0;
 }
 
 void ipc_init(void)
 {
+    ipcNodeKilled = 0;
+
     int threadId = svcCreateThread(ipc_thread, 0, (u32*)(threadStack + sizeof(threadStack)), sizeof(threadStack), 0x78, 1);
     if(threadId >= 0)
         svcStartThread(threadId);
+}
+
+void ipc_deinit(void)
+{
+    int fd = svcOpen("/dev/iosuhax", 0);
+    if(fd >= 0)
+    {
+        int dummy = 0;
+        svcIoctl(fd, IOCTL_KILL_SERVER, &dummy, sizeof(dummy), &dummy, sizeof(dummy));
+        svcClose(fd);
+    }
+
 }

@@ -96,7 +96,9 @@ int LoadFileToMem(const char *filepath, u8 **inbuffer, u32 *size)
 
     //! sign is optional input
     if(size)
+    {
         *size = filesize;
+    }
 
 	return filesize;
 }

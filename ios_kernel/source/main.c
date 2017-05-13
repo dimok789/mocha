@@ -26,6 +26,7 @@
 #include "utils.h"
 #include "redirection_setup.h"
 #include "ios_mcp_patches.h"
+#include "ios_acp_patches.h"
 #include "ios_fs_patches.h"
 #include "ios_bsp_patches.h"
 #include "instant_patches.h"
@@ -99,17 +100,15 @@ int _main()
 	kernel_memcpy((void*)USB_PHYS_CODE_BASE, payloads->data, payloads->size);
     payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
-    if(cfw_config.redNAND)
-    {
-        kernel_memcpy((void*)fs_get_phys_code_base(), payloads->data, payloads->size);
-        payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
+    kernel_memcpy((void*)fs_get_phys_code_base(), payloads->data, payloads->size);
+    payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
-        if(cfw_config.seeprom_red)
-        {
-            kernel_memcpy((void*)bsp_get_phys_code_base(), payloads->data, payloads->size);
-            payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
-        }
-    }
+    if(cfw_config.redNAND && cfw_config.seeprom_red)
+        kernel_memcpy((void*)bsp_get_phys_code_base(), payloads->data, payloads->size);
+    payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
+
+	kernel_memcpy((void*)acp_get_phys_code_base(), payloads->data, payloads->size);
+    payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
 
 	kernel_memcpy((void*)mcp_get_phys_code_base(), payloads->data, payloads->size);
     payloads = (payload_info_t*)( ((char*)payloads) + ALIGN4(sizeof(payload_info_t) + payloads->size) );
