@@ -82,6 +82,9 @@ void instant_patches_setup(void)
         // down display launch image at this state
         *(volatile u32*)(_text_start - 4 - 0x05100000 + 0x13D80000) = 0;
 
+        // patch the read position for the cos xml's p4.mask(ios_fs) to read 0xFFFFFFFFFFFFFFFF
+        *(volatile u32*)(0x05002BBE - 0x05000000 + 0x081C0000) = (volatile u32*)THUMB_BL(0x05002BBE, patch_SD_access_check);
+
         ios_map_shared_info_t map_info;
         map_info.paddr = 0x050BD000 - 0x05000000 + 0x081C0000;
         map_info.vaddr = 0x050BD000;
