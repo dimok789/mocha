@@ -130,7 +130,7 @@ void kernel_launch_ios(u32 launch_address, u32 L, u32 C, u32 H)
         mcp_run_patches(ios_elf_start);
         kernel_run_patches(ios_elf_start);
         fs_run_patches(ios_elf_start);
-        acp_run_patches(ios_elf_start);
+        //acp_run_patches(ios_elf_start);
 
         if(cfw_config.redNAND && cfw_config.seeprom_red)
             bsp_run_patches(ios_elf_start);

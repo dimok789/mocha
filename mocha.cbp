@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="mocha" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="ppc-gcc" />
+		<Build>
+			<Target title="build">
+				<Option output="bin/Release/mocha" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="ppc-gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="make" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean$target" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="make &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="build/cfw_config.d" />
+		<Unit filename="build/entry.d" />
+		<Unit filename="build/exception_handler.d" />
+		<Unit filename="build/fs_functions.d" />
+		<Unit filename="build/fs_utils.d" />
+		<Unit filename="build/gx2_functions.d" />
+		<Unit filename="build/ios_exploit.d" />
+		<Unit filename="build/logger.d" />
+		<Unit filename="build/main.d" />
+		<Unit filename="build/memory.d" />
+		<Unit filename="build/menu.d" />
+		<Unit filename="build/os_functions.d" />
+		<Unit filename="build/sd_fat_devoptab.d" />
+		<Unit filename="build/socket_functions.d" />
+		<Unit filename="build/sys_functions.d" />
+		<Unit filename="build/vpad_functions.d" />
+		<Unit filename="ios_bsp/build/fsa.d" />
+		<Unit filename="ios_bsp/build/seeprom.d" />
+		<Unit filename="ios_bsp/build/seeprom_asm.d" />
+		<Unit filename="ios_bsp/build/svc.d" />
+		<Unit filename="ios_bsp/ios_bsp.bin.h" />
+		<Unit filename="ios_bsp/ios_bsp_syms.h" />
+		<Unit filename="ios_bsp/source/fsa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_bsp/source/fsa.h" />
+		<Unit filename="ios_bsp/source/seeprom.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_bsp/source/seeprom_asm.s" />
+		<Unit filename="ios_bsp/source/svc.h" />
+		<Unit filename="ios_bsp/source/svc.s" />
+		<Unit filename="ios_bsp/source/types.h" />
+		<Unit filename="ios_fs/build/devices.d" />
+		<Unit filename="ios_fs/build/dumper.d" />
+		<Unit filename="ios_fs/build/fat32_format.d" />
+		<Unit filename="ios_fs/build/font.d" />
+		<Unit filename="ios_fs/build/function_hooks.d" />
+		<Unit filename="ios_fs/build/main.d" />
+		<Unit filename="ios_fs/build/mlcio.d" />
+		<Unit filename="ios_fs/build/sdio.d" />
+		<Unit filename="ios_fs/build/svc.d" />
+		<Unit filename="ios_fs/build/text.d" />
+		<Unit filename="ios_fs/ios_fs.bin.h" />
+		<Unit filename="ios_fs/ios_fs_syms.h" />
+		<Unit filename="ios_fs/source/devices.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/devices.h" />
+		<Unit filename="ios_fs/source/dumper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/dumper.h" />
+		<Unit filename="ios_fs/source/fat32_format.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/fat32_format.h" />
+		<Unit filename="ios_fs/source/font.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/font_bin.h" />
+		<Unit filename="ios_fs/source/function_hooks.s" />
+		<Unit filename="ios_fs/source/hardware_registers.h" />
+		<Unit filename="ios_fs/source/imports.h" />
+		<Unit filename="ios_fs/source/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/mlcio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/mlcio.h" />
+		<Unit filename="ios_fs/source/sdio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/sdio.h" />
+		<Unit filename="ios_fs/source/svc.h" />
+		<Unit filename="ios_fs/source/svc.s" />
+		<Unit filename="ios_fs/source/text.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_fs/source/text.h" />
+		<Unit filename="ios_fs/source/types.h" />
+		<Unit filename="ios_kernel/build/crt0.d" />
+		<Unit filename="ios_kernel/build/elf_patcher.d" />
+		<Unit filename="ios_kernel/build/exception_handler.d" />
+		<Unit filename="ios_kernel/build/fsa.d" />
+		<Unit filename="ios_kernel/build/instant_patches.d" />
+		<Unit filename="ios_kernel/build/ios_bsp_patches.d" />
+		<Unit filename="ios_kernel/build/ios_fs_patches.d" />
+		<Unit filename="ios_kernel/build/ios_fs_patches_asm.d" />
+		<Unit filename="ios_kernel/build/ios_mcp_patches.d" />
+		<Unit filename="ios_kernel/build/ios_mcp_patches_asm.d" />
+		<Unit filename="ios_kernel/build/kernel_patches.d" />
+		<Unit filename="ios_kernel/build/kernel_patches_asm.d" />
+		<Unit filename="ios_kernel/build/main.d" />
+		<Unit filename="ios_kernel/build/redirection_setup.d" />
+		<Unit filename="ios_kernel/build/text.d" />
+		<Unit filename="ios_kernel/build/utils.d" />
+		<Unit filename="ios_kernel/ios_kernel.bin.h" />
+		<Unit filename="ios_kernel/ios_kernel_syms.h" />
+		<Unit filename="ios_kernel/source/config.h" />
+		<Unit filename="ios_kernel/source/crt0.s" />
+		<Unit filename="ios_kernel/source/elf_abi.h" />
+		<Unit filename="ios_kernel/source/elf_patcher.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/elf_patcher.h" />
+		<Unit filename="ios_kernel/source/exception_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/exception_handler.h" />
+		<Unit filename="ios_kernel/source/font_bin.h" />
+		<Unit filename="ios_kernel/source/fsa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/fsa.h" />
+		<Unit filename="ios_kernel/source/instant_patches.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/instant_patches.h" />
+		<Unit filename="ios_kernel/source/ios_bsp_patches.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/ios_bsp_patches.h" />
+		<Unit filename="ios_kernel/source/ios_fs_patches.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/ios_fs_patches.h" />
+		<Unit filename="ios_kernel/source/ios_fs_patches_asm.s" />
+		<Unit filename="ios_kernel/source/ios_mcp_patches.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/ios_mcp_patches.h" />
+		<Unit filename="ios_kernel/source/ios_mcp_patches_asm.s" />
+		<Unit filename="ios_kernel/source/kernel_patches.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/kernel_patches.h" />
+		<Unit filename="ios_kernel/source/kernel_patches_asm.s" />
+		<Unit filename="ios_kernel/source/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/redirection_setup.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/redirection_setup.h" />
+		<Unit filename="ios_kernel/source/text.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/text.h" />
+		<Unit filename="ios_kernel/source/types.h" />
+		<Unit filename="ios_kernel/source/utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_kernel/source/utils.h" />
+		<Unit filename="ios_mcp/build/crt0.d" />
+		<Unit filename="ios_mcp/build/font.d" />
+		<Unit filename="ios_mcp/build/fsa.d" />
+		<Unit filename="ios_mcp/build/imports.d" />
+		<Unit filename="ios_mcp/build/ipc.d" />
+		<Unit filename="ios_mcp/build/logger.d" />
+		<Unit filename="ios_mcp/build/main.d" />
+		<Unit filename="ios_mcp/build/net_ifmgr_ncl.d" />
+		<Unit filename="ios_mcp/build/socket.d" />
+		<Unit filename="ios_mcp/build/svc.d" />
+		<Unit filename="ios_mcp/build/text.d" />
+		<Unit filename="ios_mcp/ios_mcp.bin.h" />
+		<Unit filename="ios_mcp/ios_mcp_syms.h" />
+		<Unit filename="ios_mcp/source/crt0.s" />
+		<Unit filename="ios_mcp/source/font.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/font_bin.h" />
+		<Unit filename="ios_mcp/source/fsa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/fsa.h" />
+		<Unit filename="ios_mcp/source/imports.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/imports.h" />
+		<Unit filename="ios_mcp/source/ipc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/ipc.h" />
+		<Unit filename="ios_mcp/source/ipc_types.h" />
+		<Unit filename="ios_mcp/source/logger.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/logger.h" />
+		<Unit filename="ios_mcp/source/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/net_ifmgr_ncl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/net_ifmgr_ncl.h" />
+		<Unit filename="ios_mcp/source/socket.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/socket.h" />
+		<Unit filename="ios_mcp/source/svc.h" />
+		<Unit filename="ios_mcp/source/svc.s" />
+		<Unit filename="ios_mcp/source/text.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ios_mcp/source/text.h" />
+		<Unit filename="ios_mcp/source/types.h" />
+		<Unit filename="ios_usb/build/crt0.d" />
+		<Unit filename="ios_usb/build/main.d" />
+		<Unit filename="ios_usb/ios_usb.bin.h" />
+		<Unit filename="ios_usb/ios_usb_syms.h" />
+		<Unit filename="ios_usb/source/crt0.s" />
+		<Unit filename="ios_usb/source/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/cfw_config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/cfw_config.h" />
+		<Unit filename="src/common/common.h" />
+		<Unit filename="src/common/fs_defs.h" />
+		<Unit filename="src/common/os_defs.h" />
+		<Unit filename="src/common/types.h" />
+		<Unit filename="src/dynamic_libs/fs_defs.h" />
+		<Unit filename="src/dynamic_libs/fs_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/fs_functions.h" />
+		<Unit filename="src/dynamic_libs/gx2_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/gx2_functions.h" />
+		<Unit filename="src/dynamic_libs/gx2_types.h" />
+		<Unit filename="src/dynamic_libs/os_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/os_functions.h" />
+		<Unit filename="src/dynamic_libs/os_types.h" />
+		<Unit filename="src/dynamic_libs/socket_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/socket_functions.h" />
+		<Unit filename="src/dynamic_libs/sys_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/sys_functions.h" />
+		<Unit filename="src/dynamic_libs/vpad_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dynamic_libs/vpad_functions.h" />
+		<Unit filename="src/entry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fs/fs_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fs/fs_utils.h" />
+		<Unit filename="src/fs/sd_fat_devoptab.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/fs/sd_fat_devoptab.h" />
+		<Unit filename="src/ios_exploit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/ios_exploit.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main.h" />
+		<Unit filename="src/menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/menu.h" />
+		<Unit filename="src/system/exception_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/system/exception_handler.h" />
+		<Unit filename="src/system/memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/system/memory.h" />
+		<Unit filename="src/utils/logger.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/utils/logger.h" />
+		<Unit filename="src/utils/utils.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
