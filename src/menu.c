@@ -36,7 +36,7 @@
 #include "dynamic_libs/socket_functions.h"
 #include "menu.h"
 
-#define MAX_CONFIG_SETTINGS_EXPERT          9
+#define MAX_CONFIG_SETTINGS_EXPERT          10
 #define MAX_CONFIG_SETTINGS_DEFAULT         (MAX_CONFIG_SETTINGS_EXPERT - 3)
 
 #define TEXT_SEL(x, text1, text2)           ((x) ? (text1) : (text2))
@@ -54,6 +54,7 @@ struct {
     { "Don't relaunch OS", "on", "off" },
     { "Launch System Menu", "on", "off" },
     { "redNAND", "on", "off" },
+    { "Start wupserver", "on", "off" },
 
     /* Expert settings */
     { "SEEPROM redirection", "on", "off" },
@@ -171,12 +172,15 @@ int ShowMenu(cfw_config_t * currentConfig)
                     config.redNAND = !config.redNAND;
                     break;
                 case 6:
-                    config.seeprom_red = !config.seeprom_red;
+                    config.wupserver = !config.wupserver;
                     break;
                 case 7:
-                    config.otp_red = !config.otp_red;
+                    config.seeprom_red = !config.seeprom_red;
                     break;
                 case 8:
+                    config.otp_red = !config.otp_red;
+                    break;
+                case 9:
                     config.syshaxXml = !config.syshaxXml;
                     break;
                 default:
