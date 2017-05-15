@@ -47,12 +47,15 @@ struct {
     const char *disabled;
 } selection_options[] =
 {
+    /* Normal settings */
     { "Config view mode", "expert", "default" },
     { "Skip this menu on launch", "on", "off" },
     { "Show launch image", "on", "off" },
     { "Don't relaunch OS", "on", "off" },
     { "Launch System Menu", "on", "off" },
     { "redNAND", "on", "off" },
+
+    /* Expert settings */
     { "SEEPROM redirection", "on", "off" },
     { "OTP redirection", "on", "off" },
     { "Use syshax.xml (coldboothax)", "on", "off" },
