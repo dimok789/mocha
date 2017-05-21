@@ -22,7 +22,7 @@ void createDevThread_entry(int node_type, u32 *dev_handles)
             sdcard_init();
         }
     }
-    else if(node_type == NODE_TYPE_DEV_UMS)
+    /*else if(node_type == NODE_TYPE_DEV_UMS)
     {
         // instead of hooking into attach at 0x10732FBC...lets do this and let the system do the mount
         fs_attach_info_t * info = (fs_attach_info_t *)(*(u32*)0x1091C2E4);
@@ -44,7 +44,7 @@ void createDevThread_entry(int node_type, u32 *dev_handles)
             info = info->next;
         }
         while(info);
-    }
+    }*/
     else if(node_type == NODE_TYPE_DEV_ATFS) // ATFS is started right before ISFS for slc/slccmpt
     {
         cfw_config_t cfw_config;

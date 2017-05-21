@@ -46,6 +46,8 @@ void mcp_run_patches(u32 ios_elf_start)
 
     section_write_word(ios_elf_start, 0x05056718, ARM_BL(0x05056718, _text_start));
 
+    section_write_word(ios_elf_start, 0x05002BBE, THUMB_BL(0x05002BBE, patch_SD_access_check));
+
     if(cfw_config.syshaxXml)
     {
         section_write(ios_elf_start, 0x050600DC, "/vol/system/config/syshax.xml", 0x20);

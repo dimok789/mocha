@@ -34,7 +34,7 @@ mcp_patches_table:
      .word 0x05052C44,      patch_IOSC_VerifyPubkeySign,            8
      .word 0x05052A90,      patch_cert_verification,                8
      .word 0x05054D6C,      patch_cached_cert_check,                8
-     .word 0x0502ADF6,      patch_wfs_partition_check,              4
+#     .word 0x0502ADF6,      patch_wfs_partition_check,              4
 #     .word 0x05014AD8,      patch_wfs_partition_check,              4
 # over an hour, MCP crash prevention
      .word 0x05022474,      0xFFFFFFFF,                             4

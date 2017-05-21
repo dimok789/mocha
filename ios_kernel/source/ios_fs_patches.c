@@ -81,13 +81,13 @@ void fs_run_patches(u32 ios_elf_start)
         //section_write_word(ios_elf_start, FS_USB_WRITE, ARM_B(FS_USB_WRITE, usbWrite_patch));
     }
 
-    section_write_word(ios_elf_start, 0x1070F87C, ARM_BL(0x1070F87C, FSA_AttachVolume_FillDescription_hook));
-    section_write_word(ios_elf_start, 0x10700EFC, ARM_BL(0x10700EFC, FSA_AsyncCommandCallback_hook));
+    //section_write_word(ios_elf_start, 0x1070F87C, ARM_BL(0x1070F87C, FSA_AttachVolume_FillDescription_hook));
+    //section_write_word(ios_elf_start, 0x10700EFC, ARM_BL(0x10700EFC, FSA_AsyncCommandCallback_hook));
     // patch mounting FAT and allow all devices instead of only SD card
-    section_write_word(ios_elf_start, 0x1078E074, 0xEA000002);
+    //section_write_word(ios_elf_start, 0x1078E074, 0xEA000002);
     // patch FSA_MakeQuota to not store command -> command is modified depending on wether it is USB FAT or not
-    section_write_word(ios_elf_start, 0x1070BE0C, 0xE1A00000);
-    section_write_word(ios_elf_start, 0x1070BE00, ARM_BL(0x1070BE00, FSA_MakeQuota_asm_hook));
+    //section_write_word(ios_elf_start, 0x1070BE0C, 0xE1A00000);
+    //section_write_word(ios_elf_start, 0x1070BE00, ARM_BL(0x1070BE00, FSA_MakeQuota_asm_hook));
 
     section_write_word(ios_elf_start, FS_CREATEDEVTHREAD_HOOK, ARM_B(FS_CREATEDEVTHREAD_HOOK, createDevThread_hook));
 
