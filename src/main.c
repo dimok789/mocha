@@ -20,6 +20,7 @@
 #include "menu.h"
 #include "main.h"
 #include "ios_exploit.h"
+#include "nnu.h"
 
 static int exitToHBLOnLaunch = 0;
 
@@ -60,6 +61,8 @@ int Menu_Main(void)
             forceMenu = (vpad.btns_d | vpad.btns_h) & VPAD_BUTTON_B;
         }
     }
+
+	nnupatcher();
 
     mount_sd_fat("sd");
 
