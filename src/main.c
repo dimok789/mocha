@@ -62,8 +62,6 @@ int Menu_Main(void)
         }
     }
 
-	nnupatcher();
-
     mount_sd_fat("sd");
 
     cfw_config_t config;
@@ -87,12 +85,14 @@ int Menu_Main(void)
             if(config.noIosReload == 0)
             {
                 OSForceFullRelaunch();
+		nnupatcher();
                 SYSLaunchMenu();
                 returnCode = EXIT_RELAUNCH_ON_LOAD;
             }
             else if(config.launchSysMenu)
             {
                 SYSLaunchMenu();
+		nnupatcher();
                 exitToHBLOnLaunch = 1;
                 returnCode = EXIT_RELAUNCH_ON_LOAD;
             }
