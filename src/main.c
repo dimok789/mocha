@@ -85,8 +85,8 @@ int Menu_Main(void)
             if(config.noIosReload == 0)
             {
                 OSForceFullRelaunch();
-		nnupatcher();
                 SYSLaunchMenu();
+		nnupatcher();
                 returnCode = EXIT_RELAUNCH_ON_LOAD;
             }
             else if(config.launchSysMenu)
