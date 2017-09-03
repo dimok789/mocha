@@ -20,6 +20,7 @@
 #include "menu.h"
 #include "main.h"
 #include "ios_exploit.h"
+#include "nnu.h"
 
 static int exitToHBLOnLaunch = 0;
 
@@ -85,11 +86,13 @@ int Menu_Main(void)
             {
                 OSForceFullRelaunch();
                 SYSLaunchMenu();
+		nnupatcher();
                 returnCode = EXIT_RELAUNCH_ON_LOAD;
             }
             else if(config.launchSysMenu)
             {
                 SYSLaunchMenu();
+		nnupatcher();
                 exitToHBLOnLaunch = 1;
                 returnCode = EXIT_RELAUNCH_ON_LOAD;
             }
