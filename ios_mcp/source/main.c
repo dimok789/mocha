@@ -24,7 +24,11 @@ int _startMainThread(void)
             drawSplashScreen();
         }
 
-        wupserver_init();
+        if(cfw_config.wupserver)
+        {
+            wupserver_init();
+        }
+
         ipc_init();
     }
     return 0;

@@ -82,6 +82,7 @@ void default_config(cfw_config_t * config)
     config->noIosReload = 0;
     config->launchSysMenu = 1;
     config->redNAND = 0;
+    config->wupserver = 1;
     config->seeprom_red = 0;
     config->otp_red = 0;
     config->syshaxXml = 0;
@@ -122,6 +123,8 @@ int read_config(cfw_config_t * config)
                 config->noIosReload = atoi(value);
             else if(strcmp(option, "launchSysMenu") == 0)
                 config->launchSysMenu = atoi(value);
+            else if(strcmp(option, "wupserver") == 0)
+                config->wupserver = atoi(value);
         }
     }
 
@@ -144,6 +147,7 @@ int write_config(cfw_config_t * config)
     fprintf(pFile, "noIosReload=%i\n", config->noIosReload);
     fprintf(pFile, "launchSysMenu=%i\n", config->launchSysMenu);
     fprintf(pFile, "redNAND=%i\n", config->redNAND);
+    fprintf(pFile, "wupserver=%i\n", config->wupserver);
     fprintf(pFile, "seeprom_red=%i\n", config->seeprom_red);
     fprintf(pFile, "otp_red=%i\n", config->otp_red);
     fprintf(pFile, "syshaxXml=%i\n", config->syshaxXml);

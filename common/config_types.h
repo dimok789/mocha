@@ -32,6 +32,7 @@ typedef struct
     int noIosReload;
     int launchSysMenu;
     int redNAND;
+    int wupserver;
     int seeprom_red;
     int otp_red;
     int syshaxXml;
