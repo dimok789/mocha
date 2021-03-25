@@ -95,6 +95,8 @@ int fatfs_init(struct fatfs *fs)
         break;
         case 0x00:
             valid_partition = 0;
+            if (GET_16BIT_WORD(fs->currentsector.sector, 0x0B) != FAT_SECTOR_SIZE)
+                return FAT_INIT_WRONG_PARTITION_TYPE;
             break;
         default:
             if (fs->currentsector.sector[PARTITION1_TYPECODE_LOCATION] <= 0x06)
@@ -103,7 +105,8 @@ int fatfs_init(struct fatfs *fs)
     }
 
     // Read LBA Begin for the file system
-    if (valid_partition)
+    // Try to parse as FAT32 even if a non valid partition is specified
+    if (valid_partition || GET_16BIT_WORD(fs->currentsector.sector, 0x0B) != FAT_SECTOR_SIZE)
         fs->lba_begin = GET_32BIT_WORD(fs->currentsector.sector, PARTITION1_LBA_BEGIN_LOCATION);
     // Else possibly MBR less disk
     else
@@ -176,8 +179,9 @@ int fatfs_init(struct fatfs *fs)
             fs->rootdir_first_cluster = 0;
 
             // Volume is FAT16
-            fs->fat_type = FAT_TYPE_16;
-            return FAT_INIT_OK;
+            return FAT_INIT_WRONG_FILESYS_TYPE;
+            //fs->fat_type = FAT_TYPE_16;
+            //return FAT_INIT_OK;
         }
         else
         {
